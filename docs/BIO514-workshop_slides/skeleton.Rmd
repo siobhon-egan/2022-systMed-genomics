@@ -1,0 +1,1727 @@
+---
+title: "Microbiome data analysis & visualization"
+subtitle: "Applications of Systems Medicine (BIO514)"
+author: "Siobhon Egan"
+date: "April 2022"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/murdoch-fonts.css", "assets/murdoch.css"]
+    self_contained: false # if true, fonts will be stored locally
+    seal: true # show a title slide with YAML information
+    includes:
+      in_header: "assets/mathjax-equation-numbers.html"
+    nature:
+      beforeInit: ["assets/remark-zoom.js", "https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9' # alternatives '16:9' or '4:3' or others e.g. 13:9
+      navigation:
+        scroll: false # disable slide transitions by scrolling
+---
+
+```{r message=FALSE, warning=FALSE, cache=FALSE, load_refs, echo=FALSE}
+library(RefManageR)
+knitr::opts_chunk$set(comment=NA)
+BibOptions(check.entries = FALSE, 
+           bib.style = "authoryear", 
+           cite.style = 'authoryear', 
+           style = "markdown",
+           hyperlink = FALSE, 
+           dashed = FALSE)
+myBib <- ReadBib("assets/example.bib", check = FALSE)
+# set icon info
+top_icon = function(x) {
+  icons::icon_style(
+    icons::fontawesome(x),
+    position = "fixed", top = 10, right = 10
+  )
+}
+```
+
+
+class: title-slide
+background-image: url("assets/MU_welcomecountry.jpg")
+background-position: 100% 50%
+background-size: 100% 100%
+
+# .text-shadow[.black[Welcome]]
+
+
+---
+
+# Outline
+
+**Workshops and tutorials on microbiome and genomics**
+
+Today we will be doing through some microbiome bioinformatics.
+
+Workshop notes and data available:
+
+GitHub code repository `r top_icon("github")` [`siobhon-egan/2022-systMed-genomics`](http://github.com/siobhon-egan/2022-systMed-genomics)          
+Website with information & tutorials `r top_icon("link")` [`siobhonlegan.com/2022-systMed-genomics`](http://siobhonlegan.com/2022-systMed-genomics)
+
+---
+class: murdoch-red
+
+# References `r top_icon("bookmark")`
+
+<font size="4">
+
+- Johnson, J.S., Spakowicz, D.J., Hong, BY. et al. Evaluation of 16S rRNA gene sequencing for species and strain-level microbiome analysis. Nat Commun 10, 5029 (2019). doi: [10.1038/s41467-019-13036-1](https://doi.org/10.1038/s41467-019-13036-1)
+- Pollock J, Glendinning L, Wisedchanwet T, Watson M. The Madness of Microbiome: Attempting To Find Consensus "Best Practice" for 16S Microbiome Studies. Appl Environ Microbiol. 2018;84(7):e02627-17. doi: [10.1128/AEM.02627-17](https://doi.org/10.1128/AEM.02627-17)
+- Nilakanta H, Drews KL, Firrell S, Foulkes MA, Jablonski KA. A review of software for analyzing molecular sequences. BMC Res Notes. 2014;7:830. doi: [10.1186/1756-0500-7-830](https://doi.org/10.1186/1756-0500-7-830)
+- Roumpeka DD, Wallace RJ, Escalettes F, Fotheringham I, Watson M. A Review of Bioinformatics Tools for Bio-Prospecting from Metagenomic Sequence Data. Front Genet. 2017;8:23. doi: [10.3389/fgene.2017.00023](https://doi.org/10.3389/fgene.2017.00023)
+- Schriefer AE, Cliften PF, Hibberd MC, Sawyer C, Brown-Kennerly V, Burcea L, Klotz E, Crosby SD, Gordon JI, Head RD. A multi-amplicon 16S rRNA sequencing and analysis method for improved taxonomic profiling of bacterial communities. J Microbiol Methods. 2018;154:6-13. doi: [10.1016/j.mimet.2018.09.019](https://doi.org/10.1016/j.mimet.2018.09.019)
+- Bharti R, Grimm DG. Current challenges and best-practice protocols for microbiome analysis. Brief Bioinform. 2021;22(1):178-193. doi: [10.1093/bib/bbz155](https://doi.org/10.1093/bib/bbz155)
+- Allaband C, McDonald D, Vázquez-Baeza Y, et al. Microbiome 101: Studying, Analyzing, and Interpreting Gut Microbiome Data for Clinicians. Clin Gastroenterol Hepatol. 2019;17(2):218-230. doi: [10.1016/j.cgh.2018.09.017](10.1016/j.cgh.2018.09.017)
+- Lepage P, Leclerc MC, Joossens M, et al. A metagenomic insight into our gut's microbiome. Gut 2013;62:146-158. doi: [10.1136/gutjnl-2011-301805](http://dx.doi.org/10.1136/gutjnl-2011-301805)
+- Ref: Liu, YX., Qin, Y., Chen, T. et al. A practical guide to amplicon and metagenomic analysis of microbiome data. Protein Cell (2020). [10.1007/s13238-020-00724-8](https://doi.org/10.1007/s13238-020-00724-8)
+
+
+---
+
+## Glossary `r top_icon("book")`
+
+.font80[
+- **Microbiome** 
+    - The microorganisms of a specific habitat and surrounding environment. Sometimes specific for bacteria, but also can be used more broadly for microscopic organisms (e.g. viruses, single-cell eukaryotes, bacteria and sometimes parasites).
+- **Metagenomics**
+      - All the genetic material recovered directly from environmental samples.
+- **OTUs** 
+      - Operation taxonomic units. Generally considered to be clustered at 97% similar level - species level.
+- **ASVs** 
+      - Amplicon sequence variants. Denoised sequence variants. Equivalent to zero radius operational taxonomic units (zOTU).   
+- **16S** 
+      - 16S ribosomal RNA gene, small subunit of a prokaryotic ribosome (SSU rRNA).
+- **Hypervariable region** 
+      - Portions in the genome of a taxa with much higher levels of variation than other similar areas.
+]
+      
+---
+
+## Glossary `r top_icon("book")`
+
+.font80[
+- **Cluster** 
+      -  Algorithms that attempt to group related biological sequences, generally at a set threshold, for example: species level = 97% (e.g. OTUs).
+- **Denoise** 
+      - A computational method for removing sequence errors and identifying correct true biological sequences in the reads. These approaches provide improved resolution and result in unique biological sequences (e.g. ASVs, ZOTUs).
+- **OTU table**
+      - Also known as count data, contains the list of OTU/ASVs and number of sequences per sample.     
+In this example each row is a sample and a column is the OTU/ASV.
+- **Taxonomy table**
+      - Spreadsheet containing OTU/ASV and taxonomic identify, generally as 7 columns (Kingdom, Phylum, Class, Order, Family, Genus, Species).
+- **Sample data**
+      - contains metadata associated with samples.
+- **Phyloseq object**
+      - Multi-component data set merging OTU table, taxonomy table, sample data, sequences and phylogenetic table. Part of the [phyloseq R package](https://joey711.github.io/phyloseq/).
+]
+
+---
+
+## Setup `r top_icon("download")`
+
+**REQUIRED** 
+
+We will be using RStudio to analyse the data set. It is recommend you have the following installed: [*RStudio version 1.4*](https://rstudio.com/products/rstudio/download/) or later and [*R version 4.0*](https://www.r-project.org/) or later. Further details on getting started in RStudio [here](http://siobhonlegan.com/research_site/rstudio/).
+
+
+**Optional** (*not needed for today's workshop*)
+
+We will not be doing the sequence pre-processing steps today but if you did want to do this you will need to download [conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) and [QIIME2](https://qiime2.org/).
+
+> If you are you are interested in genomic bioinformatics try install/set up this in the breaks or come make a time to see me if any issues.
+
+---
+
+## Setup `r top_icon("download")`
+
+- **Sequence data** (*optional*)
+.small[
+**Raw amplicon 16S sequence data** from West et al. (2020) *Gut* 69, 1452-1459. doi: [10.1136/gutjnl-2019-319620](http://dx.doi.org/10.1136/gutjnl-2019-319620).
+Download raw data from NCBI Sequence Read Archive. Project number `PRJNA493625` from https://sra-explorer.info/.
+
+You will not be required to download this for today's tutorial but if you wanted you could use this data and follow the [sequence processing](http://siobhonlegan.com/2022-systMed-genomics/2.1seqProcessing.html) page.
+]
+
+I have also uploaded pre-processed QIIME2 sequence data as outlined in [sequence processing](2.1seqProcessing.html). This is available for download on [FigShare](https://figshare.com/s/0c459524e59953bf2585). Download files and you can view them using [QIIME2 view](https://view.qiime2.org/).
+
+---
+
+## Setup `r top_icon("download")`
+
+- **RData** (*REQUIRED*)
+.small[
+The easiest way to follow along with this tutorial is to download this GitHub repository using either option **1** or **2** below:
+
+1. Go to https://github.com/siobhon-egan/2022-systMed-genomics and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
+
+2. Use terminal and clone the GitHub repo.
+]
+```
+git clone https://github.com/siobhon-egan/2022-systMed-genomics.git
+```
+
+In the **data/BIO514/** directory you will find:
+- Three `.csv` files which contain the output from the QIIME2 pipeline. The files are: (1) otu_tabe (count data), (2) tax_table (taxonomy) and (3) sam_data (sample meatdata).
+- An `.Rdata` file which we will load into R for the analysis - really this is just a file that contains all three of the spreadsheets above in an R format that is already formatted and ready to go for analysis.
+
+---
+
+## Methods `r top_icon("flask")`
+
+Exert direct from [West et al. 2020. *Gut*. doi: 10.1136/gutjnl-2019-319620](http://dx.doi.org/10.1136/gutjnl-2019-319620).
+
+.small[
+Stool samples were randomised for processing and DNA was extracted (see online supplementary methods) using the PowerLyzer PowerSoil DNA Isolation Kit (Mo Bio). 16S rRNA gene amplicon sequencing targeting the V1-V2 regions was performed on the Illumina MiSeq platform as previously described<sup>21</sup>. Raw reads were processed in the R software environmentt<sup>19</sup> following a published workflow<sup>22</sup> which includes amplicon denoising implemented in ‘DADA2’<sup>23</sup>. See (online supplementary methods) for full details. Functions in the 'vegan' R package were used to calculate Shannon Diversity Indices (alpha-diversity) on data rarefied to the minimum sequencing depth and Bray-Curtis dissimilarity (beta-diversity) on log-transformed data (pseudocount of 1 added to each value). Significance of group separation in beta-diversity was assessed by permutational multivariate analysis of variance. Changes in relative abundance were tested at each taxonomic rank from phylum to genus using the Mann-Whitney U test while differentially abundant 16S rRNA gene sequences were identified using 'DESeq2'<sup>24</sup>. For 'DESeq2' analysis, data were pooled for each individual rather than analysing distinct time points.
+]
+.footnote[
+[19] R Core Team. R: a language and environment for statistical computing. Vienna, Austria: R Foundation for Statistical Computing, 2017. https://www.R-project.org/.
+[21] Mullish BH , Pechlivanis A , Barker GF , et al . Functional microbiomics: evaluation of gut microbiota-bile acid metabolism interactions in health and disease. Methods 2018;149:49–58. doi:[10.1016/j.ymeth.2018.04.028](https://doi.org/10.1016/j.ymeth.2018.04.028).
+[22] Callahan BJ , Sankaran K , Fukuyama JA , et al . Bioconductor workflow for microbiome data analysis: from raw reads to community analyses. Version 2. F1000Res 2016;5:1492. doi:[10.12688/f1000research.8986.1](https://doi.org/10.12688/f1000research.8986.1)
+[23] Callahan BJ , McMurdie PJ , Rosen MJ , et al . DADA2: high-resolution sample inference from illumina amplicon data. Nat Methods 2016;13:581–3. doi:[10.1038/nmeth.3869](https://doi.org/10.1038/nmeth.3869)
+[24] Love MI , Huber W , Anders S . Moderated estimation of fold change and dispersion for RNA-Seq data with DESeq2. Genome Biol 2014;15:550. doi:[10.1186/s13059-014-0550-8](https://doi.org/10.1186/s13059-014-0550-8) 
+]
+
+---
+
+## Background 
+
+Microbiome, metagenomics and bioinformatics is a huge area of study so we certainly wont be covering all aspects of it here.
+
+```{r, echo=FALSE, fig.align="center", out.width="60%"}
+knitr::include_graphics("images/Bharti_2019_Fig1.png")
+```
+
+.small[
+Targeted amplicon and metagenomic sequencing approaches<sup>1</sup>. 
+]
+
+.footnote[
+[1] Ref: Bharti And Grimm (2019) *Briefings in Bioinformatics* 22(1) doi: [10.1093/bib/bbz155](https://doi.org/10.1093/bib/bbz155).
+]
+
+---
+
+Today there are two main **molecular** approaches that we use for microbiome studies.
+
+**1. Metagenomics = DNA**
+
+**2. Metatranscriptomics = messenger RNA**
+
+---
+
+## Metagenomics = DNA
+
+- Genomic characterisation of bacteria.
+- Identify what bacteria is present in sample.
+- Further broken down into
+      - Amplicon sequencing
+      - Shotgun/whole genome sequencing
+      
+---
+
+### Amplicon 16S rRNA sequencing.
+
+- Sequence the 16S rRNA gene (targeting bacteria only).
+- Use primers targeting the 16S gene - hypervariable regions (V1-9). 
+- There are bias/differences between primers and regions.
+- Ref: Bukin, Y., Galachyants, Y., Morozov, I. et al. The effect of 16S rRNA region choice on bacterial community metabarcoding results. Sci Data 6, 190007 (2019). doi: [10.1038/sdata.2019.7](https://doi.org/10.1038/sdata.2019.7)
+- More recent advances in "long-read" platforms (e.g. PacBio, nanopore) allow for full length 16S rRNA gene sequences.
+- Currently not widely used but this will quickly change as technology becomes more widely available. 
+- Ref: Johnson, J.S., Spakowicz, D.J., Hong, BY. et al. Evaluation of 16S rRNA gene sequencing for species and strain-level microbiome analysis. Nat Commun 10, 5029 (2019). doi: [10.1038/s41467-019-13036-1](https://doi.org/10.1038/s41467-019-13036-1)
+
+---
+
+### Shotgun/whole genome sequencing
+
+- Sequence all the genomic material within the sample.
+- This will include the host (e.g. human) DNA as well so need much deeper level of sequencing.
+- Able to sequence viral communities - extract RNA and convert to cDNA.
+
+.content-box-yellow[
+**Pros of amplicon over shotgun**
+
+-   Cheaper
+
+-   Less data intensive
+
+-   Easier to make sense of...e.g. good reference databases available.
+
+-   More sensitive at detecting lower abundant bacteria (shot gun sequencing = mainly host DNA)
+]
+
+---
+
+## Metatranscriptomics = messenger RNA
+
+- Gene expression and regulation 
+- Used for functional potential
+- Better for relative abundance comparison - no PCR bias
+
+---
+
+```{r, echo=FALSE, fig.align="center", out.width="90%"}
+knitr::include_graphics("images/Bharti_2019_Fig2.png")
+```
+
+.small[
+A schematic overview outlining various experimental and computational challenges associated with 16S rRNA-based and shotgun metagenomic sequencing<sup>1</sup>. 
+]
+
+.footnote[
+[1] Bharti And Grimm (2019) *Briefings in Bioinformatics* 22(1) doi: [10.1093/bib/bbz155](https://doi.org/10.1093/bib/bbz155).
+]
+
+---
+
+**Terminology note**
+
+- You may see reference to difference sequencing platforms when you read so just to clarify. Next-generation sequencing = high throughput sequencing. Although now terminology has moved to "short-read" vs "long-read" sequencing. But when reading most articles next-generation sequencing usually equals short read sequencing.
+- Short read platforms
+  - 454 - pyrosequencing
+  - Ion Torrent - semiconductor sequencing
+  - Illumina - clusters on flow cell (most common)
+        - Machines: iSeq NextSeq (300 bp), MiniSeq NextSeq (300 bp), MiSeq (max 600 bp), NextSeq (300 bp), Nova Seq (500 bp)
+- Long read platforms - technologies still developing to improve accuracy
+  - PacBio
+  - Nanopore
+  
+---
+class: murdoch-lg-richblack
+
+
+# Bioinformatics `r top_icon("dna")`
+
+
+We will only briefly go through these steps to give you an idea of what is involved. There are various programs and databases required for these steps - so you won't be performing all of these on your machines today. 
+
+Instead I'll go through the main steps and give you access to some scripts. Then I'll share with you the output files that we will use for the data visualization part.
+
+There is a wealth of information and different pipelines available but generally most use very similar algorithms *under the hood*.
+
+---
+
+## Sequence Processing `r top_icon("dna")`
+
+**Main steps of processing 16S amplicon sequencing**
+
+1. Demultiplex
+2. Merge, trim and filter
+3. Cluster & denoise
+4. Assign taxonomy
+
+.small[
+The most widely used pipelines include:
+
+-   [USEARCH](https://www.drive5.com/usearch/) - either UPARSE or UNOISE
+-   [dada2](https://benjjneb.github.io/dada2/tutorial.html)
+-   [Mouthur](https://mothur.org/)
+-   [vsearch](https://github.com/torognes/vsearch)
+-   [QIIME2](https://qiime2.org/) - this using either dada2 or vsearch
+]
+
+---
+
+### Step 1. Demulitplex `r top_icon("dna")`
+
+- Use of barcodes (i.e. sequence of 6-8 nucleotides added to primers to identify individual samples).
+- Depending on library prep used and sequencing platform this might be automated.
+- E.g. Illumina and Nextera indexes are automatically demultiplexed on sequencing machine.
+
+---
+
+### Step 2. Merge, Trim & Filter `r top_icon("dna")`
+
+**Merge - _optional_**
+
+.small[
+Depending on sequence platform/pipeline if you have forward and reverse reads you may first need to merge these. Most pipelines have built in merge function so you can avoid using a separate program. In the case of QIIME2 you **do not** need to merge reads.
+This step is fairly straight forward and not much difference between programs. [PEAR](https://cme.h-its.org/exelixis/web/software/pear/) is a popular stand alone program.
+]
+
+**Trim**
+
+.small[
+Depending on pipeline this can be done along side filtering.
+- Lots of options available, again I try and keep number of programs etc to a minimum. Most pipelines will have some sort of trimming/QC function built in.
+- [FASTQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) is popular for viewing sequence files and automating QC reports.
+]
+
+**Filter**
+
+.small[
+Comments as above. Depending on your samples and design you may need more stringent filtering. Many pipelines have additional filtering options i.e. removing low abundant sequences etc.
+]
+
+
+---
+
+### Step 3. Cluster or denoise `r top_icon("dna")`
+
+- Group related sequences.
+- Traditional approaches relied on *clustering*.
+  - Grouped sequences that were within 97% similar i.e group sequences at the species level.
+  -  Common tools = vsearch (use stand alone or within QIIME2 pipeline) and uparse (used within USEARCH pipeline).
+-  Newer approaches use *denoising* method.
+  -  More accurate method to correct sequencing errors and determine real biological sequences at single nucleotide resolution by generating amplicon sequence variants (ASVs).
+  -  Common tools = dada2 (use stand alone or within QIIME2 pipeline) and unoise3 (used within USEARCH pipeline).
+
+---
+
+>**Terminology**: The data produced from the clustering/denoising step is referred to a either "Operational Taxonomic Units (OTUs)" or "Amplicon Sequence Variants (ASVs)". Unfortunately terminology in genomics is not always consistent. But as a general rule of thumb OTUs refer to data produced via clustering and ASVs refers to data produced by denoising (however unoise3 in USEARCH refers to these as Zero-radius taxonomic units (ZOTUs) in this case ZOTU = ASV).
+
+---
+
+### Step 4. Assign taxonomy `r top_icon("dna")`
+
+-  Algorithms on taxonomic assignment and classification level (e.g. Genus, Family etc). Rarely obtain accurate species level assignment with 16S amplicon but depends on the amplicon region, size, taxa group and region of 16S gene.
+  -  [q2-feature-classifier](https://docs.qiime2.org/2021.2/plugins/available/feature-classifier) - used in QIIME2 pipeline (one of the best options currently available).
+  -  [SINTAX](https://www.drive5.com/usearch/manual/sintax_algo.html) - used within USEARCH pipeline.
+-  Curated databases with representative of taxa. Comparison of main databases - SILVA, RDP, Greengenes, NCBI and OTT how do these taxonomies compare? Balvociute and Huson (2017) BMC Genomics, 18(2), 114. doi: [10.1186/s12864-017-3501-4](https://doi.org/10.1186/s12864-017-3501-4).
+  -   [Greengenes](https://greengenes.secondgenome.com/)
+  -   [SILVA](https://www.arb-silva.de/)
+  -   [RDP](https://rdp.cme.msu.edu/)
+
+---
+
+## Data cleaning and visualization
+
+There are a number of different analysis and visualization options that you can use depending on your data and questions.
+
+Some common examples include:
+
+- Rarefaction curves
+- Alpha diversity plots
+- Taxonomy barplots/heatmaps
+- Beta diversity and ordination
+- Network analysis
+- Correlation
+- Phylogenetic
+
+---
+
+
+```{r, echo=FALSE, fig.align="center", out.width="50%"}
+knitr::include_graphics("images/Liu_2020_Fig3.png")
+```
+
+
+.font80[
+Overview of statistical and visualization methods for feature tables. Downstream analysis of microbiome feature tables, including alpha/beta-diversity (A/B), taxonomic composition (C), difference comparison (D), correlation analysis (E), network analysis (F), classification of machine learning (G), and phylogenetic tree (H)<sup>1</sup>. 
+]
+
+.footnote[
+[1] Liu, YX., Qin, Y., Chen, T. et al. A practical guide to amplicon and metagenomic analysis of microbiome data. Protein Cell (2020). [10.1007/s13238-020-00724-8](https://doi.org/10.1007/s13238-020-00724-8).
+]
+
+---
+
+In this part of the workshop we will go through some different ways you can visualize the data and some statistical analysis. We will do this in RStudio. Just like the bioinformatic sites above there is a wealth of options for this. My personal preference is RStudio as it is easily reproducible (*VERY* important for bioinformatics) and is easy to upscale. In addition with the ever increasing data being produced RStudio provides the best platform to integrate different data types and create custom pipelines.
+
+
+Working within RStudio environment is not limited to just running code locally on your machine. [RShiny](https://shiny.rstudio.com/) allows you to make custom apps and web interface programs..
+
+Further detail on cleaning data after processing sequences is covered [here](http://siobhonlegan.com/2022-systMed-genomics/2.2dataCleaning.html)
+
+---
+## Links `r top_icon("link")`
+
+[Useful links for microbial genomics analysis](http://siobhonlegan.com/2022-systMed-genomics/2.introBIO514.html)
+
+- [Happy Belly Bioinformatics](https://astrobiomike.github.io/misc/amplicon_and_metagen) - A useful website containing information, tutorials and links related to bioinformatics (written by a biologist turned bioinformatician!)
+- [mixOmics](http://mixomics.org/mixdiablo/) - Our mixOmics R package proposes a whole range of multivariate methods that we developed and validated on many biological studies to gain more insight into ‘omics biological studies. [Useful GitBook here](https://mixomicsteam.github.io/Bookdown/index.html)
+- [phyloseq](https://joey711.github.io/phyloseq/) - R package for the analysis of microbial communities brings many challenges. Integration of many different types of data with methods from ecology, genetics, phylogenetics, network analysis, visualization and testing
+- [Tools for Microbiome Analysis](https://microsud.github.io/Tools-Microbiome-Analysis/) - A list of R environment based tools for microbiome data exploration, statistical analysis and visualization
+- [My own list of useful microbiome resources](http://siobhonlegan.com/research_site/bioinfo/genomics/) - this includes some links to RShiny packages which provide an interactive look at your data. However they require your data to be in a specific format.
+
+---
+class: murdoch-lg-richblack
+
+# Sequence Processing example `r top_icon("dna")`
+
+As mentioned there are lots of options for processing sequence data, this work flow uses the [QIIME2](https://qiime2.org/) pipeline. While you can also perform statistical analysis and visualize your data in QIIME2, as it is a web based platform it is restricted in terms of analysis options, customising figures, cleaning & subsetting data and integrating other data.
+
+---
+
+## My approach & recommendations: `r top_icon("bookmark")`
+
+.font80[
+- Keep up to date with the latest, best practice pipelines and algorithms.     
+    - However you will need to draw a line at some point.
+    - Decide on a method and stick to it. 
+    - Document what you did and why. 
+    - **Hint**: this is why good documentation at time of analysis is so important! You *will not* remember in a few days/weeks/months what and why you analysed the data in a certain way.
+- Use open source programs
+    - Reproducibility - don't have to rely on subscriptions etc. 
+    - Easier to collaborate and allow others to help you.
+    - Good documentation and community forums.
+- Minimize the number of different languages/programs required. 
+    - "Easy-to-use" GUI program may seem promising, but can create down stream issues with integrating other data.
+    - As programs/environments get updated, it can limit portability. 
+]
+
+.purple[**You need to find a balance that works for you and your study question(s).**]
+
+---
+
+## File formats `r top_icon("folder")`
+
+Before we begin let's just go over some different file format terminology.
+
+**FASTQ**       
+- Text-based sequencing data file format that stores both raw sequence data and quality scores. 
+- FASTQ files have become the standard format for storing NGS data from Illumina sequencing systems, and can be used as input for a wide variety of secondary data analysis solutions.
+- Each entry in a FASTQ file consists of 4 lines:
+    - Sequence identifier
+    - Sequence
+    - Quality score identifier line (consisting only of a +)
+    - Quality score
+- The first line, identifying the sequence, contains the following elements.
+    - `@<instrument>:<run number>:<flowcell ID>:<lane>:<tile>:<x-pos>:<y-pos>:<UMI> <read>:<is filtered>:<control number>:<index>`
+
+---
+
+**FASTA** `r top_icon("folder")`
+
+- Very widely used sequence format. 
+- It consists of a header line starting with a `>` character followed by a code identifying the sequence (and description). The header line is followed by one or more lines containing the sequence itself. FASTA files may contain one or more sequences. .purple[open in text editor].
+
+---
+
+**BIOM** `r top_icon("folder")`
+
+- The BIOM file format (canonically pronounced biome) is designed to be a general-use format for representing biological sample by observation contingency tables. 
+- Handles storage of large, sparse biological contingency tables
+- Support encapsulation of core study data (contingency table data and sample/observation metadata) in a single file
+- Facilitate the use of these tables between tools that support this format (e.g., passing of data between different programs.).
+
+---
+
+**Trees** `r top_icon("folder")`
+.small[
+Trees can be encoded in a number of different formats, all of which must represent the nested structure of a tree. They may or may not encode branch lengths and other features. Standardized formats are critical for distributing and sharing trees without relying on graphics output that is hard to import into existing software. Commonly used formats are
+- nexus
+- newick
+
+**Spreadsheets containing data**
+
+Open in excel/google sheets or text editor
+
+- tab-separated values (TSV) 
+- comma-separated values (CSV) 
+]
+
+---
+
+**R files** `r top_icon("folder")`
+
+- `.R` - R scripts
+- `.Rmd` - R markdown file. Contain a mix of text and "code chunks"
+- `.RData`or `.rda` - for storing a complete R workspace or selected "objects" from a workspace in a form that can be loaded back by R
+
+
+---
+
+## QIIME2 `r top_icon("terminal")`
+
+Official [QIIME2 docs](https://qiime2.org/), and view objects via [QIIME2 view](https://view.qiime2.org/).
+
+Customised scripts available at https://github.com/siobhon-egan/qiime2_analysis
+
+Pipeline created with [QIIME2-2020.11](https://docs.qiime2.org/2020.11/install/native/), see QIIME2 documentation for install based on your platform.
+
+QIIME2 introduces its own files formats known as `.qza.` and `.qzv` files. This are unique to QIIME2 and you will likely need to convert these to some other readable format. 
+
+---
+
+### Import data `r top_icon("terminal")`
+
+Import `.fastq.gz` data into QIIME2 format using [Casava 1.8 demultiplexed (paired-end)](https://docs.qiime2.org/2020.11/tutorials/importing/#casava-1-8-paired-end-demultiplexed-fastq) option. Remember assumes raw data is in directory labeled `raw_data/` and file naming format as above.
+
+```bash
+qiime tools import \
+--type 'SampleData[PairedEndSequencesWithQuality]' \
+--input-path raw_data \
+--input-format CasavaOneEightSingleLanePerSampleDirFmt \
+--output-path 16S_demux_seqs.qza
+
+# create visualization file
+qiime demux summarize \
+  --i-data 16S_demux_seqs.qza \
+  --o-visualization 16S_demux_seqs.qzv
+```
+
+Inspect `16S_demux_seqs.qzv` artifact for quality scores. This will help decide on QC parameters. 
+
+---
+
+### Denoising `r top_icon("terminal")`
+
+Based on quality plot in the above output `16S_demux_seqs.qza` adjust trim length to where quality falls.
+
+Then you can also trim primers. In this case working with 16S V1-2 data.
+
+```bash
+qiime dada2 denoise-paired \
+  --i-demultiplexed-seqs 16S_demux_seqs.qza \
+*  --p-trim-left-f 20 \
+*  --p-trim-left-r 19 \
+*  --p-trunc-len-f 250 \
+  --p-trunc-len-r 250 \
+  --o-table 16S_denoise_table.qza \
+  --o-representative-sequences 16S_denoise_rep-seqs.qza \
+  --o-denoising-stats 16S_denoise-stats.qza
+```
+
+---
+`r top_icon("terminal")`
+
+At this stage, you will have artifacts containing the feature table, corresponding feature sequences, and DADA2 denoising stats. You can generate summaries of these as follows.
+
+```bash
+qiime feature-table summarize \
+  --i-table 16S_denoise_table.qza \
+  --o-visualization 16S_denoise_table.qzv \
+  --m-sample-metadata-file sample-metadata.tsv # Can skip this bit if needed.
+
+qiime feature-table tabulate-seqs \
+  --i-data 16S_denoise_rep-seqs.qza \
+  --o-visualization 16S_denoise_rep-seqs.qzv
+
+qiime metadata tabulate \
+  --m-input-file 16S_denoise-stats.qza \
+  --o-visualization 16S_denoise-stats.qzv
+```
+
+---
+`r top_icon("terminal")`
+**Export ASV table**
+
+To produce an ASV table with number of each ASV reads per sample that you can open in excel. 
+
+Need to make biom file first
+
+```bash
+qiime tools export \
+--input-path 16S_denoise_table.qza \
+--output-path feature-table
+
+biom convert \
+-i feature-table/feature-table.biom \
+-o feature-table/feature-table.tsv \
+--to-tsv
+```
+
+---
+
+### Phylogeny `r top_icon("terminal")`
+
+Several downstream diversity metrics require that a phylogenetic tree be constructed using the Operational Taxonomic Units (OTUs) or Amplicon Sequence Variants (ASVs) being investigated.
+
+```bash
+qiime phylogeny align-to-tree-mafft-fasttree \
+  --i-sequences rep-seqs.qza \
+  --o-alignment aligned-rep-seqs.qza \
+  --o-masked-alignment masked-aligned-rep-seqs.qza \
+  --o-tree unrooted-tree.qza \
+  --o-rooted-tree rooted-tree.qza
+```
+
+**Export**
+
+Covert unrooted tree output to newick formatted file
+
+```bash
+qiime tools export \
+  --input-path unrooted-tree.qza \
+  --output-path exported-tree
+```
+
+---
+
+### Taxonomy `r top_icon("terminal")`
+
+Assign taxonomy to denoised sequences using a pre-trained naive bayes classifier and the q2-feature-classifier plugin. Details on how to create a classifier are available [here](https://github.com/siobhon-egan/qiime2_analysis/blob/master/2.classifiers.md). 
+
+I am using a pre-training classifier for the 16S V1-2 with reference a SILVA database version 138.1.
+
+Note that taxonomic classifiers perform best when they are trained based on your specific sample preparation and sequencing parameters, including the primers that were used for amplification and the length of your sequence reads.
+
+---
+`r top_icon("terminal")`
+**Classifier**
+
+```bash
+qiime feature-classifier classify-sklearn \
+--i-classifier /Taxonomy/QIIME2_classifiers_v2020.11/Silva_99_Otus/27F-388Y/classifier.qza \
+--i-reads 16S_denoise_rep-seqs.qza \
+--o-classification qiime2-taxa-silva/taxonomy.qza
+
+qiime metadata tabulate \
+--m-input-file qiime2-taxa-silva/taxonomy.qza \
+--o-visualization qiime2-taxa-silva/taxonomy.qzv
+```
+
+---
+
+## Data output `r top_icon("table")`
+
+Lets take a took at something prepared earlier.
+
+There are two major outputs from the process above.
+
+```{r, message=FALSE, warning=FALSE,  echo = T, results = 'hide'}
+pkgs <- c("readr", "rmarkdown")
+library("DT"); library("dplyr")
+lapply(pkgs, require, character.only = TRUE)
+otu_table <- read_csv("../data/BIO514/otu_table.csv", skip = 1, col_names=FALSE)
+otu_table <- rename(otu_table, Sample_name = X1)
+otu_table_sub <- select(otu_table, Sample_name, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15, X16, X17, X18, X19, X20)
+```
+
+**1. The count data** 
+
+This is the data contains the list of ASVs and number of sequences per sample.     
+In this example each row is a sample and a column is the OTU/ASV.
+
+---
+`r top_icon("table")`
+**Count data** - showing first 20 OTUs only
+
+```{r}
+otu_table_sub %>% 
+  DT::datatable(class = "compact", extensions = "Buttons",
+                options = list(dom = 'tBp', buttons = c("csv","excel"), 
+                               pageLength = 8)) 
+```
+
+
+---
+`r top_icon("table")`
+
+**Taxonomy**
+
+```{r include=FALSE}
+# read data
+tax_table <- read_csv("../data/BIO514/tax_table.csv")
+# To make it easier viewing remove sequence name in first column
+drop <- c("X1")
+df_tax = tax_table[,!(names(tax_table) %in% drop)]
+```
+```{r}
+df_tax %>% 
+  DT::datatable(class = "compact", extensions = "Buttons",
+                options = list(dom = 'tBp', buttons = c("csv","excel"), 
+                               pageLength = 8))
+```
+
+---
+class: murdoch-lg-richblack
+
+# Data cleaning `r top_icon("broom")`
+
+While we will not perform these steps today but we'll spend a few minutes just talking about some data processing steps after sequence clustering/denoising.
+
+Depending on your aims the importance of these steps will differ.
+
+---
+
+## Check taxonomy `r top_icon("broom")`
+
+- Importance will depend on what the aims of your study are.
+- For most 'composition' studies or those relying on broad scale trends in patterns this won't be as important.  
+- The best method/databases will depend on your taxa. 
+- For some groups of bacteria differentiation using partial sequence of 16S gene is not possible (e.g. *Rickettsia*). 
+- Dependent on region of 16S gene. Generally sequencing the start (e.g. V1-2) has less references available then the middle of the 16S gene (e.g. V3-4).
+
+---
+`r top_icon("broom")`
+
+Two steps/parameters to consider for taxonomy assignment
+
+**1. Assignment algorithms.**
+**2. Reference databases.**
+
+Generally pipelines use curated bacteria 16S databases but if your sequence does not match any bacteria it will classify as unknown. Most people use NCBI BLAST against all sequence data to confirm identity for any taxa that require further confirmation.
+Curated database are used because they provide better accuracy, especially if you have a trained classifier as used in QIIME2. They also take up much less computer space (easier to store).
+
+The more accurate your taxonomic assignment the better downstream analysis is - in particular **functional assignment** and **16S gene copy number prediction** (see below).
+
+---
+
+## Clean sequence count data `r top_icon("broom")`
+
+Use controls to subtract that "background" bacteria noise. 
+
+Additional bonus points for
+
+- Using mock communities (e.g. Mock Bacteria ARchaea Community; MBARC-26, ref: Singer et al. *Sci Data* 3, 160081 (2016). doi: [10.1038/sdata.2016.81](https://doi.org/10.1038/sdata.2016.81)) 
+- Quantifying input DNA concentration which can then be used for frequency detection methods using [decontam package](https://benjjneb.github.io/decontam/vignettes/decontam_intro.html#identify-contaminants---frequency) (details below).
+
+---
+`r top_icon("broom")`
+
+**The `Decontam` R Package** 
+
+[decontam](https://benjjneb.github.io/decontam/) with detailed [tutorial](https://benjjneb.github.io/decontam/vignettes/decontam_intro.html)
+
+Reference: Davis et al. (2018) *Microbiome*, 6, 226 doi: [10.1186/s40168-018-0605-2](https://doi.org/10.1186/s40168-018-0605-2).
+
+.small[
+Simple code for identifying contaminant taxa based on prevalence data. 
+Phyloseq object is `ps` and the sample data has a column called `Sample_or_Control` where the control samples are `Control Sample`. Default prevalence threshold is set to `0.1`. I recommend you check what taxa is identified as "contaminant" and see if it makes sense (this where its good to know something about your samples/microbiology). You may need to adjust threshold as needed, e.g. for more aggressive classification threshold rather than the default try `0.5`.
+]
+
+---
+`r top_icon("broom")`
+
+Define control samples and identify taxa present in them using prevalence method.
+
+.small[
+```r
+sample_data(ps)$is.neg <- sample_data(ps)$Sample_or_Control == "Control Sample"
+contamdf.prev <- isContaminant(ps, method="prevalence", neg="is.neg")
+
+# Identify how many contaminants
+head(which(contamdf.prev$contaminant))
+# Identify what the contaminants are
+table(contamdf.prev$contaminant)
+```
+]
+
+---
+`r top_icon("broom")`
+Set contaminant threshold (default is 0.1).
+
+.small[
+```r
+*contamdf.prev01 <- isContaminant(ps, method="prevalence", neg="is.neg", threshold=0.1)
+table(contamdf.prev01$contaminant)
+```
+
+Then you "subtract" these taxa from your data set. Raw data is phyloseq object `ps` and will create new phyloseq object for downstream analysis `ps.decon`
+
+```
+ps.decon <- prune_taxa(!contamdf.freq$contaminant, ps)
+ps.decon
+```
+]
+
+---
+`r top_icon("broom")`
+
+**Alternative:** a very similar R package called `microDecon` also available [GitHub repo](https://github.com/donaldtmcknight/microDecon).    
+Reference: McKnight et al. (2019) *Environmental DNA*, 1, 14-25 doi: [10.1002/edn3.11](https://doi.org/10.1002/edn3.11).
+
+---
+
+## Functional assignment `r top_icon("broom")`
+
+Bacterial profiling based on 16S rRNA-based surveys gives a "who’s there?" answer. However as our knowledge improves more questions arise and now we are moving to answer question about "what can they do?". 
+
+Just like with taxonomy databases there are functional databases that group taxa into functional groups. The polypeptides predicted from these sequences are annotated by homology to gene function databases.
+
+---
+`r top_icon("broom")`
+
+**A word of caution**       
+"...inference with the default database is likely limited outside of human samples and that development of tools for gene prediction specific to different non-human and environmental samples is warranted." - Quote from Sun et al. (2020) *Microbiome* 8, 45 doi: [10.1186/s40168-020-00815-y](https://doi.org/10.1186/s40168-020-00815-y)
+
+---
+`r top_icon("broom")`
+
+Popular databases:
+
+- PICRUSt - Langille et al. (2013) *Nat Biotechnol* 31(9), 814-821 doi: [10.1038/nbt.2676](https://doi.org/10.1038/nbt.2676)
+- CopyRighter - Angly et al. (2014) *Microbiome* 2, 11 doi: [10.1186/2049-2618-2-11](https://doi.org/10.1186/2049-2618-2-11)
+- PAPRICA - Dowman and Ducklow (2015) 10(8), e0135868 *PLoS ONE* doi: [10.1371/journal.pone.0135868](https://doi.org/10.1371/journal.pone.0135868)
+- Tax4Fun - ABhauer et al (2015) *Bioinformatics.* 31, 2882–4, doi: [10.1093/bioinformatics/btv287](https://doi.org/10.1093/bioinformatics/btv287)
+
+---
+
+## Correct for 16S sequence abundance `r top_icon("broom")`
+
+Number of copies of the 16S rRNA gene in bacteria varies (1-15). Still not widely used and so far databases/tools are not worthwhile.
+
+Summary of findings in Louca et al. (2018). *Microbiome* 6, 41 doi: [10.1186/s40168-018-0420-9](https://doi.org/10.1186/s40168-018-0420-9).
+
+.small[
+- "...16S gene copy numbers (GCNs) could only be accurately predicted for a limited fraction of taxa, namely taxa with closely to moderately related representatives (<15% divergence in the 16S rRNA gene)."
+- "...all considered tools exhibit low predictive accuracy when evaluated against completely sequenced genomes, in some cases explaining less than 10% of the variance."
+- "Substantial disagreement was also observed between tools (R2<0.5) for the majority of tested microbial communities"
+- .content-box-yellow[*In summary*: "We recommend **against correcting for 16S GCNs** in microbiome surveys by default..."]
+]
+
+---
+`r top_icon("broom")` 
+Some other references:
+
+- PICRUSt - Langille et al. (2013) *Nat Biotechnol* 31(9), 814-821 doi: [10.1038/nbt.2676](https://doi.org/10.1038/nbt.2676)
+- CopyRighter - Angly et al. (2014) *Microbiome* 2, 11 doi: [10.1186/2049-2618-2-11](https://doi.org/10.1186/2049-2618-2-11)
+- PAPRICA - Dowman and Ducklow (2015) 10(8), e0135868 *PLoS ONE* doi: [10.1371/journal.pone.0135868](https://doi.org/10.1371/journal.pone.0135868)
+- UNBIAS [Edgar preprint](https://www.biorxiv.org/content/10.1101/124149v1.full.pdf) available in [USEARCH](https://www.drive5.com/usearch/)
+
+---
+
+class: murdoch-red
+
+# BREAK `r top_icon("coffee")`
+
+Make sure you have R installed for when we come back.
+
+---
+
+# Data Visualization `r top_icon("chart-bar")`
+
+.small[
+This data is `phyloseq` format. This is the most commonly used data format for amplicon data in RStudio. 
+As we have skipped over getting our data into R, here are some help links on this matter [phyloseq](https://joey711.github.io/phyloseq/import-data.html) and customised [tutorial here](https://cryptick-lab.github.io/NGS-Analysis/_site/QIIME2-DataImport.html).
+
+Essentially we need at least three bits of data that talk to each other:
+
+- **Count data** - sometimes called OTU data. Usually OTUs/ASVs are rows and each column is sample.
+- **Taxonomy data** - this contains the taxonomy of the count (or OTU) data. Each row is a unique OTU/ASV and column reflect **Kingdom, Phylum, Class, Order, Family, Genus, Species**.
+- **Sample data** - sometimes referred to as metadata. This includes all the additional information on samples e.g. sample variables such as collection time, patient age, disease status etc. 
+
+*Optional data*
+
+- **Phylogenetic tree** - usually as newick format but other options available. For some beta-diversity analysis this is required
+- **Ref sequences** - sequences of OTUs or ASV (as `.fasta` format)
+]
+
+---
+
+## Download GitHub Repo `r top_icon("chart-bar")`
+
+The easiest way to follow along with this tutorial is to download this GitHub repository using either option **1** or **2** below:
+
+1. Go to https://github.com/siobhon-egan/2022-systMed-genomics and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
+
+
+2. Use terminal and clone the GitHub repo.
+
+```
+git clone https://github.com/siobhon-egan/2022-systMed-genomics.git
+```
+
+---
+
+## Load libraries `r top_icon("chart-bar")`
+
+```{r, message=FALSE, warning=FALSE,  echo = T, results = 'hide'}
+pkgs <- c("tidyverse", "santaR", "phyloseq", "ggpubr", "ggplot2",
+          "vegan", "DESeq2", "mixOmics", "Hmisc", "igraph", "ppcor", 
+          "reshape2", "plotly", "microbiomeutilities", "ampvis2",
+          "MicrobiotaProcess", "microbiome", "DirichletMultinomial",
+          "magrittr")
+lapply(pkgs, require, character.only = TRUE)
+```
+
+
+
+---
+
+## Load data `r top_icon("chart-bar")`
+
+Load data in RData - downloaded from https://github.com/ka-west/PBS_manuscript
+
+```{r, eval=TRUE}
+load("../data/BIO514/PBS_data.Rdata")
+# Quick glance at phyloseq object
+ps_M
+```
+
+---
+
+## Inspect data `r top_icon("chart-bar")`
+
+**Number of reads**
+
+This will give you an overview of the number of reads per sample and per OTU. Important to know the 'depth' of sequencing. Generally for amplicon 16S microbiome you want many 10's of thousands of (good reads) per sample. The more complex the sample the more reads you need (but there is a very large variation in studies and not set rule).
+
+---
+`r top_icon("chart-bar")`
+
+.small[
+```{r, fig.height=4.5, fig.width=12,}
+readsumsdf = data.frame(nreads = sort(taxa_sums(ps_M), TRUE), sorted = 1:ntaxa(ps_M), 
+    type = "OTUs")
+readsumsdf = rbind(readsumsdf, data.frame(nreads = sort(sample_sums(ps_M), 
+    TRUE), sorted = 1:nsamples(ps_M), type = "Samples"))
+title = "Total number of reads"
+nreads = ggplot(readsumsdf, aes(x = sorted, y = nreads)) + geom_bar(stat = "identity")
+nreads = nreads + ggtitle(title) + scale_y_log10() + facet_wrap(~type, 1, scales = "free")
+nreads
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+**Read density plot**     
+Useful for QC purposes. This will show you the distribution of sequencing depth among samples. Ideally you want an even number of reads per sample. If you see lots of variation then library preparation needs to be optimised and you will need to perform more thorough data cleaning (i.e. rarefy reads - but this is not ideal.     
+Ref: McMurdie PJ, Holmes S. Waste not, want not: why rarefying microbiome data is inadmissible. PLoS Comput Biol. 2014 3;10(4):e1003531. doi: [https://doi.org/10.1371/journal.pcbi.1003531](10.1371/journal.pcbi.1003531).
+
+---
+`r top_icon("chart-bar")`
+
+```{r, fig.height=4.5, fig.width=12}
+read_distrib <- plot_read_distribution(ps_M, groups = "Group", 
+                                       plot.type = "density")
+read_distrib
+```
+
+---
+
+## Rarefaction `r top_icon("chart-bar")`
+
+Rarefaction is a technique to assess species richness from the results of sampling - mainly used in ecology. This curve is a plot of the number of species as a function of the number of samples. Rarefaction curves generally grow rapidly at first, as the most common species are found, but the curves plateau as only the rarest species remain to be sampled. We use this plot to see if we have reached an adequate level of sequencing depth for our samples.
+
+---
+`r top_icon("chart-bar")`
+
+.scroll-box-20[
+```{r}
+# set seed
+set.seed(1)
+# set subsample
+subsamples = c(10, 5000, 10000, 20000, 30000)
+
+rarecurve <- plot_alpha_rcurve(ps_M, index="observed", 
+                       subsamples = subsamples,
+                       lower.conf = 0.025, 
+                       upper.conf = 0.975,
+                       group="Group_label",
+                       label.color = "brown3",
+                       label.size = 3,
+                       label.min = TRUE) 
+# change color of line 
+mycols <- c("brown3", "steelblue")
+
+rarecurve <- rarecurve + scale_color_manual(values = mycols) + 
+  scale_fill_manual(values = mycols)
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=6.5, fig.width=15, message=FALSE, warning=FALSE}
+# set seed
+set.seed(1)
+# set subsample
+subsamples = c(10, 5000, 10000, 20000, 30000)
+
+rarecurve <- plot_alpha_rcurve(ps_M, index="observed", 
+                       subsamples = subsamples,
+                       lower.conf = 0.025, 
+                       upper.conf = 0.975,
+                       group="Group_label",
+                       label.color = "brown3",
+                       label.size = 3,
+                       label.min = TRUE) 
+# change color of line 
+mycols <- c("brown3", "steelblue")
+
+rarecurve <- rarecurve + scale_color_manual(values = mycols) + 
+  scale_fill_manual(values = mycols)
+rarecurve
+```
+
+---
+
+## Alpha diversity `r top_icon("chart-bar")`
+
+Alpha diversity is the mean species diversity within a sample. There are different measurements/indexes. The most simplest being how many ASV/OTUs in each sample.
+
+Today we will produce alpha diversity plots using 6 measures:
+
+- Observed
+- Chao1
+- ACE
+- Shannon
+- Simpson
+- InvSimpson
+
+> The reason we produce so many measures is that we might want to compare with various papers which might report on different measures. 
+
+---
+`r top_icon("chart-bar")`
+Statistical analysis with wilcoxon pair-wise test
+
+.scroll-box-20[
+```{r}
+alpha_meas = c("Observed", "Chao1", "ACE", "Shannon", "Simpson", "InvSimpson")
+p <- plot_richness(ps_M, "Group_label", measures = alpha_meas)
+
+alphadiv <-
+  p + geom_boxplot(data = p$data,
+                   aes(x = Group_label, y = value, fill = Group_label),
+                   alpha = 0.1) + theme_bw() + 
+  theme(axis.text.x = element_text(size = 8, angle = 90)) +
+  theme(axis.title.x = element_blank()) +
+  scale_fill_manual(values=c("brown3", "steelblue"))
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+alphadiv
+```
+
+---
+`r top_icon("chart-bar")`
+
+Save your figures directly from R for bonus points on quality data reproducibility!
+This line with save your combined alpha diversity plots into a directory called *plots/*
+
+```
+ggsave("alphadiv.pdf", plot = alphadiv, path = "plots", 
+       width = 30, height = 30, units = "cm")
+```
+
+---
+
+## Distribution plot `r top_icon("chart-bar")`
+
+This plot is good to give you an idea of the how taxa are distribution within the data. 
+It will give you an idea about general trends in the data and help guide how further analysis.
+
+.scroll-box-12[
+```{r}
+# Bariatric Surgery
+NBS_ps <- subset_samples(ps_M, Group_label=="NBS")
+NBS_ps_dis <- taxa_distribution(NBS_ps) + 
+  theme_biome_utils() + 
+  labs(title = "No Bariatric Surgery")
+
+# Malabsorptive
+MAL_ps <- subset_samples(ps_M, Group_label=="MAL")
+MAL_ps_dis <- taxa_distribution(MAL_ps) + 
+  theme_biome_utils() + 
+  labs(title = "Malabsorptive")
+
+# Merge the plots together for publication ready figures!
+distrib = ggarrange(NBS_ps_dis, MAL_ps_dis, ncol = 1, nrow = 2)
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+distrib
+```
+
+---
+
+## Taxa summary `r top_icon("chart-bar")`
+
+Create a bar plot of phyla - showing difference in two groups `No bariatric surgery` vs `Malabsorptive`.
+Note that depending on your study present a barplot might a quick way to see patterns in your data generally they are not used to represent the community composition in your final figures.
+
+Use these for visualizing at higher taxonomic levels (mostly phylum level). Remember also that you need to be careful when looking at relative microbiome abundance!
+
+---
+`r top_icon("chart-bar")`
+
+.scroll-box-12[
+```{r}
+mycols <- c("brown3", "steelblue")
+grp_abund <- get_group_abundances(ps_M, 
+                                  level = "Phylum", 
+                                  group="Group",
+                                  transform = "compositional")
+
+
+
+mean.plot.phy <- grp_abund %>% # input data
+  ggplot(aes(x= reorder(OTUID, mean_abundance), # reroder based on mean abundance
+             y= mean_abundance,
+             fill=Group)) + # x and y axis
+  geom_bar(stat = "identity",
+           position=position_dodge()) + 
+  scale_fill_manual("Group", values=mycols) + # manually specify colors
+  theme_bw() + # add a widely used ggplot2 theme
+  ylab("Mean Relative Abundance") + # label y axis
+  xlab("Phylum") + # label x axis
+  coord_flip() # rotate plot 
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+mean.plot.phy
+```
+
+---
+`r top_icon("chart-bar")`
+
+Create a bar plot of order - showing difference in two groups `No bariatric surgery` vs `Malabsorptive`
+
+.scroll-box-12[
+```{r}
+mycols <- c("brown3", "steelblue")
+grp_abund <- get_group_abundances(ps_M, 
+                                  level = "Order", 
+                                  group="Group",
+                                  transform = "compositional")
+
+
+
+mean.plot.ord <- grp_abund %>% # input data
+  ggplot(aes(x= reorder(OTUID, mean_abundance), # reroder based on mean abundance
+             y= mean_abundance,
+             fill=Group)) + # x and y axis 
+  geom_bar(stat = "identity",
+           position=position_dodge()) + 
+  scale_fill_manual("Group", values=mycols) + # manually specify colors
+  theme_bw() + # add a widely used ggplot2 theme
+  ylab("Mean Relative Abundance") + # label y axis
+  xlab("Order") + # label x axis
+  coord_flip() # rotate plot 
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+mean.plot.ord
+```
+
+---
+`r top_icon("chart-bar")`
+
+**Composition barplot**
+
+To quickly visualize comparison in taxa between make a relative abundance barplot of taxa between sample group (aggregate taxa at family level).
+
+.scroll-box-12[
+```{r}
+# Get relative abundance and remove low abundant taxa
+ps1.rel <- microbiome::transform(ps_M, "compositional")
+ps1.fam.rel <-aggregate_rare(ps1.rel, level = "Family", detection = 0.005, prevalence = 0.5)
+
+comp_plot <- plot_composition(ps1.fam.rel,
+                      average_by = "Group_label") + 
+  guides(fill = guide_legend(ncol = 1)) + 
+  labs(x = "Samples", 
+       y = "Relative abundance",
+       title = "Relative abundance data") +
+  scale_fill_brewer("Family", palette = "Paired")
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+comp_plot
+```
+
+---
+
+## Top taxa `r top_icon("chart-bar")`
+
+Now we'll just take the top 5 family taxa. Lets plot the abundance between the two groups.
+Make some comments on the value of this type of analysis and how you might interpret the data (tell me also about the type of bacteria that were identified as well).
+
+.scroll-box-15[
+```{r}
+mycols <- c("brown3", "steelblue")
+top_tax <- plot_taxa_boxplot(ps_M,
+                        taxonomic.level = "Family",
+                        top.otu = 6, 
+                        group = "Group_label",
+                        add.violin= TRUE,
+                        group.colors = mycols,
+                        title = "Top six family", 
+                        keep.other = FALSE,
+                        dot.size = 1)
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+top_tax
+```
+
+---
+
+## Heatmap `r top_icon("chart-bar")`
+
+Rather than a barplot heatmaps are much better at presenting the microbiome composition in samples. These are commonly used in publications!
+
+Create heatmap of core microbiome [tutorial](https://microbiome.github.io/tutorials/Core.html)
+
+Keep only taxa with count above zero and transform to compositional (relative abundance).
+
+```{r}
+ps.prune <- prune_taxa(taxa_sums(ps_M) > 0, ps_M)
+pseq.rel <- microbiome::transform(ps.prune, "compositional")
+```
+
+---
+`r top_icon("chart-bar")`
+
+Aggregate data to genus level and make heat map of the most prevalent taxa.
+
+.scroll-box-18[
+```{r}
+library(RColorBrewer)
+
+ps.m3.rel.gen <- aggregate_taxa(pseq.rel, "Genus")
+prevalences <- seq(.05, 1, .05)
+detections <- 10^seq(log10(1e-4), log10(.2), length = 10)
+
+core_heatmap <- plot_core(ps.m3.rel.gen, 
+                plot.type = "heatmap", 
+                colours = rev(brewer.pal(5, "RdBu")),
+                prevalences = prevalences, 
+                detections = detections, min.prevalence = .5) +
+  xlab("Detection Threshold (Relative Abundance (%))")
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+core_heatmap
+```
+
+---
+`r top_icon("chart-bar")`
+
+Make a heat map of all samples - this can get a bit messy when you have a lot of samples but helpful to quickly see how different samples compare.
+
+.scroll-box-16[
+```{r}
+ps1.rel <-aggregate_rare(ps_M, level = "Family", detection = 10, prevalence = 0.5)
+
+pseq.famlog <- microbiome::transform(ps1.rel, "log10")
+
+p.famrel.heatmap <- plot_composition(pseq.famlog, 
+                             sample.sort = NULL, 
+                             otu.sort = NULL, 
+                             x.label = "Group_label", 
+                             plot.type = "heatmap", 
+                             verbose = FALSE)
+
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=13}
+p.famrel.heatmap
+```
+.small[
+To view interactively execute the following R code.
+`ggplotly(p.famrel.heatmap)`
+]
+
+---
+
+## Betadiversity `r top_icon("chart-bar")`
+
+Variation of microbial communities between samples. Beta diversity shows the different between microbial communities from different environments.
+
+**Distance measures**
+
+**Bray–Curtis dissimilarity**
+- based on abundance or read count data
+- differences in microbial abundances between two samples (e.g., at species level)
+    values are from 0 to 1
+    0 means both samples share the same species at exact the same abundances
+    1 means both samples have complete different species abundances
+
+---
+`r top_icon("chart-bar")`
+
+**Jaccard distance**
+- based on presence or absence of species (does not include abundance information)
+- different in microbial composition between two samples
+    0 means both samples share exact the same species
+    1 means both samples have no species in common
+
+**UniFrac**
+- sequence distances (phylogenetic tree)
+- based on the fraction of branch length that is shared between two samples or unique to one or the other sample
+unweighted UniFrac: purely based on sequence distances (does not include abundance information)
+weighted UniFrac: branch lengths are weighted by relative abundances (includes both sequence and abundance information)
+
+.small[
+- [Phyloseq](https://joey711.github.io/phyloseq/plot_ordination-examples.html)
+- [MicrobiomeMiseq tutorial by Michelle Berr](http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html#constrained_ordinations)
+- [ampvis2](http://albertsenlab.org/ampvis2-ordination/)
+]
+
+---
+
+### Ordination `r top_icon("chart-bar")`
+
+Ordination methods are used to highlight differences between samples based on their microbial community composition - also referred to as distance- or (dis)similarity measures.
+
+.small[
+These techniques reduce the dimensionality of microbiome data sets so that a summary of the beta diversity relationships can be visualized in 2D or 3D plots. The principal coordinates (axis) each explains a certain fraction of the variability (formally called inertia). This creates a visual representation of the microbial community compositional differences among samples. Observations based on ordination plots can be substantiated with statistical analyses that assess the clusters.
+]
+
+---
+`r top_icon("chart-bar")`
+
+There are many options for ordination. Broadly they can be broken into:
+
+**1. Implicit and Unconstrained (exploratory)**
+
+- Principal Components Analysis (PCA)	using Euclidean distance
+- Correspondence Analysis (CA) using Pearson chi-squared
+- Detrended Correspondence Analysis (DCA) using chi-square
+
+**2. Implicit and Constrained (explanatory)**
+- Redundancy Analysis (RDA) using Euclidean distance
+- Canonical Correspondance Analysis (CCA) using Pearson chi-squared
+
+
+---
+`r top_icon("chart-bar")`
+
+**3. Explicit and Unconstrained (exploratory)**
+
+- Principal Coordinates Analysis (PCoA)	
+- non-metric Multidimensional Scaling (nMDS)
+- Choose your own distance measure
+    - Bray-Curtis - takes into account abundance (in this case abundance is the number of reads).
+    - Pearson chi-squares - statistical test on randomness of differences
+    - Jaccard - presence/absence
+    - Chord
+    - UniFrac, which incorporates phylogeny. 
+    - *Note*: if you set the distance metric to Euclidean then PCoA becomes Principal Components Analysis.
+
+
+---
+`r top_icon("chart-bar")`
+
+**Some extra explanatory notes on PCoA and nMDS**
+
+PCoA is very similar to PCA, RDA, CA, and CCA in that they are all based on eigenan alysis: each of the resulting axes is an eigen vector associated with an eigen value, and all axes are orthogonal to each other. This means that all axes reveal unique information about the inertia in the data, and exactly how much inertia is indicated by the eigenvalue. When plotting the ordination result in an x/y scatterplot, the axis with the largest eigenvalue is plotted on the first axis, and the one with the second largest on the second axis.
+
+---
+`r top_icon("chart-bar")`
+
+**Some extra explanatory notes on PCoA and nMDS**
+
+NMDS attempts to represent the pairwise dissimilarity between objects in a low-dimensional space. Can use any dissimilarity coefficient or distance measure. NMDS is a rank-based approach based on an iterative algorithm. While information about the magnitude of distances is lost, rank-based methods are generally more robust to data which do not have an identifiable distribution. NMDS routines often begin by random placement of data objects in ordination space. The algorithm then begins to refine this placement by an iterative process, attempting to find an ordination in which ordinated object distances closely match the order of object dissimilarities in the original distance matrix. The stress value reflects how well the ordination summarizes the observed distances among the samples.
+
+---
+
+#### Detrended correspondence analysis (DCA) `r top_icon("chart-bar")`
+
+`Implicit and Unconstrained (exploratory)`
+
+Ordination of samples using DCA. Leave distance blank, so default is chi-square.
+
+```{r}
+# Ordinate the data
+set.seed(4235421)
+mycols <- c("brown3", "steelblue")
+# proj <- get_ordination(pseq, "MDS", "bray")
+ord.dca <- ordinate(ps_M, "DCA")
+ord_DCA = plot_ordination(ps_M, ord.dca, color = "Group_label") +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_DCA
+```
+
+---
+#### Canonical correspondence analysis (CCA) `r top_icon("chart-bar")`
+
+`Implicit and Constrained (explanatory)`
+
+Ordination of samples using CCA methods using Pearson chi-squared. Constrained variable used as `Group_label`.
+
+```{r}
+mycols <- c("brown3", "steelblue")
+pseq.cca <- ordinate(ps_M, "CCA", cca = "Group_label")
+ord_CCA <- plot_ordination(ps_M, pseq.cca, color = "Group_label")
+ord_CCA <- ord_CCA + geom_point(size = 4) + 
+  scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_CCA
+```
+
+---
+
+#### Redundancy analysis (RDA) `r top_icon("chart-bar")`
+
+`Implicit and Constrained (explanatory)`
+    
+Ordination of samples using RDA methods using Euclidean distance. Constrained variable used as `Group_label`.
+
+```{r}
+mycols <- c("brown3", "steelblue")
+pseq.rda <- ordinate(ps_M, "RDA", cca = "Group_label")
+ord_RDA <- plot_ordination(ps_M, pseq.rda, color = "Group_label")
+ord_RDA <- ord_RDA + geom_point(size = 4) + 
+  scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_RDA
+```
+
+---
+
+#### Principal Coordinates Analysis (PCoA) `r top_icon("chart-bar")`
+
+.small[
+PCoA is very similar to PCA, RDA, CA, and CCA in that they are all based on eigenanalysis: each of the resulting axes is an eigenvector associated with an eigenvalue, and all axes are orthogonal to each other. This means that all axes reveal unique information about the inertia in the data, and exactly how much inertia is indicated by the eigenvalue.
+
+Ordination of samples using PCoA methods and **jaccard** (presence/absence) distance measure
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r}
+# Ordinate the data
+set.seed(4235421)
+mycols <- c("brown3", "steelblue")
+# proj <- get_ordination(pseq, "MDS", "bray")
+ord.pcoa.jac <- ordinate(ps_M, "PCoA", "jaccard")
+ord_PCoA_jac = plot_ordination(ps_M, ord.pcoa.jac, color = "Group_label") +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_PCoA_jac
+```
+
+---
+`r top_icon("chart-bar")`
+
+Ordination of samples using PCoA methods and **bray curtis** (abundance) distance measure.
+
+```{r}
+# Ordinate the data
+set.seed(4235421)
+mycols <- c("brown3", "steelblue")
+ord.pcoa.bray <- ordinate(ps_M, "PCoA", "bray")
+ord_PCoA_bray = plot_ordination(ps_M, ord.pcoa.bray, color = "Group_label") +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_PCoA_bray
+```
+
+---
+
+#### Principal Coordinates Analysis (PCoA) with unifrac `r top_icon("chart-bar")`
+
+Unifrac analysis takes into account not only the differences in OTUs/ASVs but also takes into account the phylogeny of the taxa. I.e. how closely related are the taxa.
+
+We can perform unweighted (using presence/absence abundance like jaccard) or weighted (incorporating abundance data - like bray curtis).
+
+*Unweighted unifrac*
+
+.scroll-box-13[
+```{r}
+# Ordinate the data
+set.seed(4235421)
+mycols <- c("brown3", "steelblue")
+ord_pcoa_ufuw <- ordinate(ps_M, "PCoA", "unifrac", weighted=FALSE)
+ord_PCoA_ufuw = plot_ordination(ps_M, ord_pcoa_ufuw, color = "Group_label", shape="Time_point") +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_PCoA_ufuw
+```
+
+---
+`r top_icon("chart-bar")`
+
+*Weighted unifrac*
+
+.scroll-box-18[
+```{r}
+mycols <- c("brown3", "steelblue")
+ord_pcoa_ufw = ordinate(ps_M, "PCoA", "unifrac", weighted=TRUE)
+ord_PCoA_ufw = plot_ordination(ps_M, ord_pcoa_ufw, color="Group_label", shape="Time_point")
+ord_PCoA_ufw <- ord_PCoA_ufw + geom_point(size = 4) + 
+  scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_PCoA_ufw
+```
+
+---
+
+#### Non-metric Multidimensional Scaling (nMDS) `r top_icon("chart-bar")`
+
+Finally lets perform ordination using Non-metric Multidimensional Scaling. We'll use the unifrac distance measure which takes into account phylogeny and also the `WEIGHTED` option.
+
+.scroll-box-15[
+```{r}
+# Ordinate the data
+set.seed(4235421)
+mycols <- c("brown3", "steelblue")
+ord_nmds_ufw <- ordinate(ps_M, "NMDS", "unifrac", weighted=TRUE)
+ord_NMDS_ufw = plot_ordination(ps_M, ord_nmds_ufw, color = "Group_label", shape="Time_point") +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse() + theme_biome_utils()
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+ord_NMDS_ufw
+```
+
+---
+
+### Statistical analysis `r top_icon("chart-bar")`
+
+Here we'll perform a statistical analysis on beta diversity.
+
+See tutorial [here](https://mibwurrepo.github.io/Microbial-bioinformatics-introductory-course-Material-2018/beta-diversity-metrics.html#permanova).
+
+Differences by `Group_label` using ANOVA
+
+.scroll-box-12[
+```{r}
+# Transform data to hellinger
+pseq.rel <- microbiome::transform(ps_M, "hellinger")
+# Pick relative abundances (compositional) and sample metadata 
+otu <- abundances(pseq.rel)
+meta <- meta(pseq.rel)
+
+# samples x SampleCategory as input
+permanova <- adonis(t(otu) ~ Group_label,
+                    data = meta, permutations=999, method = "bray")
+
+
+## statistics
+print(as.data.frame(permanova$aov.tab)["Group_label", "Pr(>F)"])
+dist <- vegdist(t(otu))
+mod <- betadisper(dist, meta$Group_label)
+### ANOVA - are groups different 
+anova(betadisper(dist, meta$Group_label))
+```
+]
+
+---
+
+## Hierarchical cluster analysis `r top_icon("chart-bar")`
+
+Beta diversity metrics can assess the differences between microbial communities. It can be visualized with PCA or PCoA, this can also be visualized with hierarchical clustering. 
+
+Function from [MicrobiotaProcess](https://bioconductor.org/packages/devel/bioc/vignettes/MicrobiotaProcess/inst/doc/MicrobiotaProcess-basics.html) using analysis based on [ggtree](https://yulab-smu.top/treedata-book/).
+
+.scroll-box-12[
+```{r}
+## All samples - detailed, include species and SampleCategory
+clust_all <- get_clust(obj=ps_M, distmethod="euclidean",
+                      method="hellinger", hclustmethod="average")
+mycols <- c("brown3", "steelblue")
+# circular layout
+clust_all_plot <- ggclust(obj=clust_all ,
+                      layout = "circular",
+                      pointsize=3,
+                      fontsize=0,
+                      factorNames=c("Group_label", "Time_point_label")) +
+  scale_color_manual(values=mycols) +
+  scale_shape_manual(values=c(17, 15, 16)) + 
+  ggtitle("Hierarchical Cluster of All Samples (euclidean)") 
+```
+]
+
+---
+`r top_icon("chart-bar")`
+
+```{r echo=FALSE, fig.height=8.5, fig.width=15}
+clust_all_plot
+```
+
+
+---
+
+class: murdoch-red
+
+# EXPLORE `r top_icon("dove")`
+
+This workshop was intended to give you a flavour of what microbiome analysis can involve.
+
+You are encouraged to explore this topic and expand on the analysis we have done here.
+
+The internet is a wealth of options.
+
+Here is one of my favourite links for all things microbiome and R.      
+[R environment based tools for microbiome data](https://microsud.github.io/Tools-Microbiome-Analysis/)
+
+---
+
+class: murdoch-lg-richblack
+background-image: url(assets/MU_ANPC_red.jpg)
+background-size: 260px
+background-position: 5% 95%
+
+# Thanks!
+
+.pull-right[.pull-down[
+
+<a href="mailto:siobhon.egan@murdoch.edu.au">
+.white[`r top_icon("paper-plane")` siobhon.egan@murdoch.edu.au]
+</a>
+
+<a href="http://siobhonlegan.com/2022-systMed-genomics">
+.white[`r top_icon("link")` siobhonlegan.com/2022-systMed-genomics]
+</a>
+
+<a href="http://siobhon-egan.github.io/2022-systMed-genomics">
+.white[`r top_icon("github")` siobhon-egan.github.io/2022-systMed-genomics]
+</a>
+
+<br><br><br>
+
+]]

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>BIO514 - microbiome workshop</title>
+
+<script src="site_libs/header-attrs-2.11.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="assets/mystyle.css" type="text/css" />
+<link rel="stylesheet" href="assets/murdoch-fonts.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Systems Medicine</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 513
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="01seqProcessing.html">Sequence processing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 514
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="2.introBIO514.html">Introduction</a>
+    </li>
+    <li>
+      <a href="2.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="2.1seqProcessing.html">Sequence processing</a>
+    </li>
+    <li>
+      <a href="2.2dataCleaning.html">Data Cleaning</a>
+    </li>
+    <li>
+      <a href="2.3dataViz.html">Data visualization</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/siobhon-egan/2022-systMed-genomics">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">BIO514 - microbiome workshop</h1>
+
+</div>
+
+
+<p>Content for BIO514 microbiome data analysis workshop 2022.</p>
+<p><img src="assets/ANPC.png" /></p>
+<hr />
+<div id="workshop---microbiome-bioinformatic-analysis" class="section level1">
+<h1>Workshop - Microbiome bioinformatic analysis</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Content</th>
+<th align="center">Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>SLIDES</td>
+<td align="center"><a href="BIO514-workshop_slides/skeleton.html">link</a></td>
+</tr>
+<tr class="even">
+<td>Introduction</td>
+<td align="center"><a href="2.introBIO514.html">link</a></td>
+</tr>
+<tr class="odd">
+<td>Set up and resources</td>
+<td align="center"><a href="2.setup.html">link</a></td>
+</tr>
+<tr class="even">
+<td>Sequence processing</td>
+<td align="center"><a href="2.1seqProcessing.html">link</a></td>
+</tr>
+<tr class="odd">
+<td>Data cleaning</td>
+<td align="center"><a href="2.2dataCleaning.html">link</a></td>
+</tr>
+<tr class="even">
+<td>Data visualization</td>
+<td align="center"><a href="2.3dataViz.html">link</a></td>
+</tr>
+</tbody>
+</table>
+<div id="about-the-data" class="section level2">
+<h2>About the data</h2>
+<p>Today we will be using amplicon 16S rRNA data from West et al. (2020) <em>Gut</em> 69, 1452-1459. doi: <a href="http://dx.doi.org/10.1136/gutjnl-2019-319620">10.1136/gutjnl-2019-319620</a>. The <code>Rdata</code> we will use is available from GitHub repository by the author <a href="https://github.com/ka-west/PBS_manuscript">link here</a>. For this workshop the relevant <code>.Rdata</code> for today’s session has been made available within this repository.</p>
+<p><strong>Methods</strong></p>
+<p>Exert direct from <a href="http://dx.doi.org/10.1136/gutjnl-2019-319620">West et al. 2020</a></p>
+<p>Stool samples were randomised for processing and DNA was extracted (see online supplementary methods) using the PowerLyzer PowerSoil DNA Isolation Kit (Mo Bio). 16S rRNA gene amplicon sequencing targeting the V1-V2 regions was performed on the Illumina MiSeq platform as previously described<sup>21</sup> Raw reads were processed in the R software environment<sup>19</sup> following a published workflow<sup>22</sup> which includes amplicon denoising implemented in ‘DADA2’<sup>23</sup>. See (online supplementary methods) for full details. Functions in the ‘vegan’ R package were used to calculate Shannon Diversity Indices (<span class="math inline">\(\alpha\)</span>-diversity) on data rarefied to the minimum sequencing depth and Bray-Curtis dissimilarity (<span class="math inline">\(\beta\)</span>-diversity) on log-transformed data (pseudocount of 1 added to each value). Significance of group separation in <span class="math inline">\(\beta\)</span>-diversity was assessed by permutational multivariate analysis of variance. Changes in relative abundance were tested at each taxonomic rank from phylum to genus using the Mann-Whitney U test while differentially abundant 16S rRNA gene sequences were identified using ‘DESeq2’<sup>24</sup>. For ‘DESeq2’ analysis, data were pooled for each individual rather than analysing distinct time points.</p>
+<p><strong>Extra reference for microbiome sequencing</strong><br />
+Mullish BH , Pechlivanis A , Barker GF , et al. Functional microbiomics evaluation of gut microbiota-bile acid metabolism interactions in health and disease. Methods 2018;149:49–58. doi: <a href="https://doi.org/10.1016/j.ymeth.2018.04.028">10.1016/j.ymeth.2018.04.028</a></p>
+<hr />
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Microbiome, metagenomics and bioinformatics is a huge area of study so we certainly wont be covering all aspects of it here.</p>
+<div class="figure">
+<img src="images/Bharti_2019_Fig1.png" alt="" />
+<p class="caption">Targeted amplicon and metagenomic sequencing approaches. Ref: Bharti And Grimm (2019) <em>Briefings in Bioinformatics</em> 22(1) doi: <a href="https://doi.org/10.1093/bib/bbz155">10.1093/bib/bbz155</a></p>
+</div>
+<ul>
+<li>Estimated that there are 10<sup>14</sup> microorganisms inhabiting the human gut.</li>
+<li>Human gut microbiome genome size 150 x larger than the human genome.</li>
+<li>Interactions between the microbe-host are of key interest in several pathologies and applying meta-omics to describe the human gut microbiome will give a better understanding of this crucial crosstalk at mucosal interfaces.</li>
+</ul>
+<p>Today there are two main <strong>molecular</strong> approaches that we use for microbiome studies</p>
+<p><strong>1. Metagenomics = DNA</strong></p>
+<ul>
+<li>Genomic characterisation of bacteria.</li>
+<li>Identify what bacteria is present in sample.</li>
+<li>Two main methods:
+<ul>
+<li>A. Amplicon 16S rRNA sequencing.
+<ul>
+<li>Sequence the 16S rRNA gene (targeting bacteria only).</li>
+<li>Use primers targeting the 16S gene - hypervariable regions (V1-9).</li>
+<li>There are bias/differences between primers and regions.</li>
+<li>Ref: Bukin, Y., Galachyants, Y., Morozov, I. et al. The effect of 16S rRNA region choice on bacterial community metabarcoding results. Sci Data 6, 190007 (2019). doi: <a href="https://doi.org/10.1038/sdata.2019.7">10.1038/sdata.2019.7</a></li>
+<li>Most recent advances in “long-read” platforms (e.g. PacBio, nanopore) allow for full length 16S rRNA gene sequences.</li>
+<li>Currently not widely used but this will quickly change as technology becomes more widely available.</li>
+<li>Ref: Johnson, J.S., Spakowicz, D.J., Hong, BY. et al. Evaluation of 16S rRNA gene sequencing for species and strain-level microbiome analysis. Nat Commun 10, 5029 (2019). doi: <a href="https://doi.org/10.1038/s41467-019-13036-1">10.1038/s41467-019-13036-1</a></li>
+</ul></li>
+<li>B. Shotgun/whole genome sequencing.
+<ul>
+<li>Sequence all the genomic material within the sample.</li>
+<li>This will include the host (e.g. human) DNA as well so need much deeper level of sequencing.</li>
+<li>Able to sequence viral communities - extract RNA and convert to cDNA.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>2. Metatranscriptomics = messenger RNA</strong> - Gene expression and regulation - Used for functional potential - Better for relative abundance comparison - no PCR bias</p>
+<p><strong>Pros of amplicon NGS</strong></p>
+<ul>
+<li><p>Cheaper</p></li>
+<li><p>Less data intensive</p></li>
+<li><p>Easier to make sense of…e.g. good reference databases available.</p></li>
+<li><p>More sensitive at detecting lower abundant bacteria (shot gun sequencing = mainly host DNA)</p></li>
+</ul>
+<div class="figure">
+<img src="images/Bharti_2019_Fig2.png" alt="" />
+<p class="caption">A schematic overview outlining various experimental and computational challenges associated with 16S rRNA-based and shotgun metagenomic sequencing. Ref: Bharti And Grimm (2019) <em>Briefings in Bioinformatics</em> 22(1) doi: <a href="https://doi.org/10.1093/bib/bbz155">10.1093/bib/bbz155</a></p>
+</div>
+<p><strong>Terminology note</strong></p>
+<ul>
+<li>You may see reference to difference sequencing platforms when you read so just to clarify. Next-generation sequencing = high throughput sequencing. Although now terminology has moved to “short-read” vs “long-read” sequencing. But when reading most articles next-generation sequencing usually equals short read sequencing.</li>
+<li>Short read platforms
+<ul>
+<li>454 - pyrosequencing</li>
+<li>Ion Torrent - semiconductor sequencing</li>
+<li>Illumina - clusters on flow cell (most common) - Machines: iSeq NextSeq (300 bp), MiniSeq NextSeq (300 bp), MiSeq (max 600 bp), NextSeq (300 bp), Nova Seq (500 bp)</li>
+</ul></li>
+<li>Long read platforms - technologies still developing to improve accuracy
+<ul>
+<li>PacBio</li>
+<li>Nanopore</li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="bioinformatics" class="section level2">
+<h2>Bioinformatics</h2>
+<p>We will only briefly go through these steps to give you an idea of what is involved. There are various programs and databases required for these steps - so you won’t be performing all of these on your machines today.</p>
+<p>Instead I’ll go through the main steps and give you access to some scripts. Then I’ll share with you the output files that we will use for the data visualization part.</p>
+<p>There is a wealth of information and different pipelines available but generally most use very similar algorithms <em>under the hood</em>.</p>
+<p>The most widely used pipelines include:</p>
+<ul>
+<li><a href="https://www.drive5.com/usearch/">USEARCH</a> - either UPARSE or UNOISE</li>
+<li><a href="https://benjjneb.github.io/dada2/tutorial.html">dada2</a></li>
+<li><a href="https://mothur.org/">Mouthur</a></li>
+<li><a href="https://github.com/torognes/vsearch">vsearch</a></li>
+<li><a href="https://qiime2.org/">QIIME2</a> - this using either dada2 or vsearch</li>
+</ul>
+<p>Note that the list above is not mutually exclusive. For example the popular QIIME2 uses <code>dada2</code> or <code>vsearch</code> or clustering/denoising.</p>
+<p><strong>Main steps of processing 16S amplicon sequencing</strong></p>
+<p><em>Optional first step</em> - depending on sequence platform if you have forward and reverse reads you will first need to merge these. Most pipelines have built in merge function so you can avoid using a separate program. This step is fairly straight forward and not much difference between programs. <a href="https://cme.h-its.org/exelixis/web/software/pear/">PEAR</a> is a popular stand alone program.</p>
+<ol style="list-style-type: decimal">
+<li><p>Demulitplex.</p>
+<ul>
+<li><p>Use of barcodes (i.e. sequence of 6-8 nucleotides added to primers to identify individual samples).</p></li>
+<li><p>Depending on library prep used and sequencing platform this might be automated.</p></li>
+<li><p>E.g. Illumina and Nextera indexes are automatically demultiplexed on sequencing machine.</p></li>
+</ul></li>
+<li><p>Trim primers and distal bases - this will also depend on QC (quality) scores.</p>
+<ul>
+<li>Lots of options available, again I try and keep number of programs etc to a minimum. Most pipelines will have some sort of trimming/QC function built in.</li>
+<li><a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FASTQC</a> is popular for viewing sequence files and automating QC reports.</li>
+</ul></li>
+<li><p>Cluster or denoise</p>
+<ul>
+<li><p>Group related sequences.</p></li>
+<li><p>Traditional approaches relied on <em>clustering</em>.</p>
+<ul>
+<li><p>Grouped sequences that were within 97% similar i.e group sequences at the species level.</p></li>
+<li><p>Common tools = vsearch (use stand alone or within QIIME2 pipeline) and uparse (used within USEARCH pipeline).</p></li>
+</ul></li>
+<li><p>Newer approaches use <em>denoising</em> method.</p>
+<ul>
+<li><p>More accurate method to correct sequencing errors and determine real biological sequences at single nucleotide resolution by generating amplicon sequence variants (ASVs).</p></li>
+<li><p>Common tools = dada2 (use stand alone or within QIIME2 pipeline) and unoise3 (used within USEARCH pipeline).</p></li>
+</ul></li>
+</ul></li>
+</ol>
+<p><strong>Terminology</strong>: The data produced from the clustering/denoising step is referred to a either “Operational Taxonomic Units (OTUs)” or “Amplicon Sequence Variants (ASVs)”. Unfortunately terminology in genomics is not always consistent. But as a general rule of thumb OTUs refer to data produced via clustering and ASVs refers to data produced by denoising (however unoise3 in USEARCH refers to these as Zero-radius taxonomic units (ZOTUs) in this case ZOTU = ASV).</p>
+<ol start="4" style="list-style-type: decimal">
+<li><p>Assign taxonomy</p>
+<ul>
+<li><p>Algorithms on taxonomic assignment and classification level (e.g. Genus, Family etc). Rarely obtain accurate species level assignment with 16S amplicon but depends on the amplicon region, size, taxa group and region of 16S gene.</p>
+<ul>
+<li><p><a href="https://docs.qiime2.org/2021.2/plugins/available/feature-classifier">q2-feature-classifier</a> - used in QIIME2 pipeline (one of the best options currently available).</p></li>
+<li><p><a href="https://www.drive5.com/usearch/manual/sintax_algo.html">SINTAX</a> - used within USEARCH pipeline.</p></li>
+</ul></li>
+<li><p>Curated databases with representative of taxa. Comparison of main databases - SILVA, RDP, Greengenes, NCBI and OTT how do these taxonomies compare? Balvociute and Huson (2017) BMC Genomics, 18(2), 114. doi: <a href="https://doi.org/10.1186/s12864-017-3501-4">10.1186/s12864-017-3501-4</a>.</p>
+<ul>
+<li><a href="https://greengenes.secondgenome.com/">Greengenes</a></li>
+<li><a href="https://www.arb-silva.de/">SILVA</a></li>
+<li><a href="https://rdp.cme.msu.edu/">RDP</a></li>
+</ul></li>
+</ul></li>
+</ol>
+<hr />
+</div>
+<div id="data-cleaning-and-visualization" class="section level2">
+<h2>Data cleaning and visualization</h2>
+<p>There are a number of different analysis and visualization options that you can use depending on your data and questions.</p>
+<p>Some common examples include:</p>
+<ul>
+<li>Rarefaction curves</li>
+<li>Alpha diversity plots</li>
+<li>Taxonomy barplots/heatmaps</li>
+<li>Beta diversity and ordination</li>
+<li>Network analysis</li>
+<li>Correlation</li>
+<li>Phylogenetic</li>
+</ul>
+<div class="figure">
+<img src="images/Liu_2020_Fig3.png" alt="" />
+<p class="caption">Overview of statistical and visualization methods for feature tables. Downstream analysis of microbiome feature tables, including alpha/beta-diversity (A/B), taxonomic composition (C), difference comparison (D), correlation analysis (E), network analysis (F), classification of machine learning (G), and phylogenetic tree (H). Ref: Liu, YX., Qin, Y., Chen, T. et al. A practical guide to amplicon and metagenomic analysis of microbiome data. Protein Cell (2020). <a href="https://doi.org/10.1007/s13238-020-00724-8">10.1007/s13238-020-00724-8</a></p>
+</div>
+<p>In this part of the workshop we will go through some different ways you can visualize the data and some statistical analysis. We will do this in RStudio. Just like the bioinformatic sites above there is a wealth of options for this. My personal preference is RStudio as it is easily reproducible (<em>VERY</em> important for bioinformatics) and is easy to upscale. In addition with the ever increasing data being produced RStudio provides the best platform to integrate different data types and create custom pipelines.</p>
+<p>Working within RStudio environment is not limited to just running code locally on your machine. <a href="https://shiny.rstudio.com/">RShiny</a> allows you to make custom apps and web interface programs..</p>
+<p>Further detail on cleaning data after processing sequences is covered <a href="05_datacleaning.html">here</a></p>
+<hr />
+</div>
+<div id="useful-links-for-microbial-genomics-analysis" class="section level2">
+<h2>Useful links for microbial genomics analysis</h2>
+<p><code>Mainly aimed at amplicon sequence methods</code></p>
+<ul>
+<li><a href="https://astrobiomike.github.io/misc/amplicon_and_metagen">Happy Belly Bioinformatics</a> - A useful website containing information, tutorials and links related to bioinformatics (written by a biologist turned bioinformatician!)</li>
+<li><a href="http://mixomics.org/mixdiablo/">mixOmics</a> - Our mixOmics R package proposes a whole range of multivariate methods that we developed and validated on many biological studies to gain more insight into ‘omics biological studies. <a href="https://mixomicsteam.github.io/Bookdown/index.html">Useful GitBook here</a></li>
+<li><a href="https://joey711.github.io/phyloseq/">phyloseq</a> - R package for the analysis of microbial communities brings many challenges. Integration of many different types of data with methods from ecology, genetics, phylogenetics, network analysis, visualization and testing</li>
+<li><a href="https://microsud.github.io/Tools-Microbiome-Analysis/">Tools for Microbiome Analysis</a> - A list of R environment based tools for microbiome data exploration, statistical analysis and visualization</li>
+<li><a href="http://siobhonlegan.com/research_site/bioinfo/genomics/">My own list of useful microbiome resources</a> - this includes some links to RShiny packages which provide an interactive look at your data. However they require your data to be in a specific format.</li>
+</ul>
+</div>
+</div>
+
+<hr> 
+<div class="logos"><img src="assets/squaremu.png" width="50px" align="right"></div>
+
+<br></br>
+
+<p style="text-align: center;"><span style="color: #4F5556;"><em>Copyright, Siobhon Egan, 2022.</em></span></p>
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Add font awesome icons -->
+<p style="text-align: center;">
+    <a href="https://github.com/siobhon-egan/BIO510-microbiome" class="fa fa-github"></a>
+</p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

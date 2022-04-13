@@ -1,0 +1,205 @@
+---
+title: "Set up"
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Software
+
+**REQUIRED** - We will be using RStudio to analyse the data set. It is recommend you have the following installed: [*RStudio version 1.4*](https://rstudio.com/products/rstudio/download/) or later and [*R version 4.0*](https://www.r-project.org/) or later. Further details on getting started in RStudio [here](http://siobhonlegan.com/research_site/rstudio/).
+
+**Optional** (*not needed for today's workshop*) - We will not be doing the sequence pre-processing steps today but if you did want to do this you will need to download [conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) and [QIIME2](https://qiime2.org/).
+
+## Download data
+
+1.  **Raw Sequence** (*optional*)
+
+Raw amplicon 16S sequence data from West et al. (2020) *Gut* 69, 1452-1459. doi: [10.1136/gutjnl-2019-319620](http://dx.doi.org/10.1136/gutjnl-2019-319620). Download raw data from NCBI Sequence Read Archive. Project number `PRJNA493625` from <https://sra-explorer.info/>.
+
+Rename so `fastq.gz` files in format `SAMPLEID_L001_R1_001.fastq.gz` (forward) or `SAMPLEID_L001_R2_001.fastq.gz` (reverse).
+
+You will not be required to download this for today's tutorial but if you wanted you could use this data and follow the [sequence processing](2.1seqProcessing.html) page.
+
+```bash
+#!/usr/bin/env bash
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943540/SRR7943540_1.fastq.gz -o SRR7943540_16S_V4_of_human_feces_PBS61_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943540/SRR7943540_2.fastq.gz -o SRR7943540_16S_V4_of_human_feces_PBS61_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943542/SRR7943542_1.fastq.gz -o SRR7943542_16S_V4_of_human_feces_PBS5_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943542/SRR7943542_2.fastq.gz -o SRR7943542_16S_V4_of_human_feces_PBS5_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_1.fastq.gz -o SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_2.fastq.gz -o SRR7943539_16S_V4_of_human_feces_PBS43_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943541/SRR7943541_1.fastq.gz -o SRR7943541_16S_V4_of_human_feces_PBS68_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943541/SRR7943541_2.fastq.gz -o SRR7943541_16S_V4_of_human_feces_PBS68_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943544/SRR7943544_1.fastq.gz -o SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943544/SRR7943544_2.fastq.gz -o SRR7943544_16S_V4_of_human_feces_PBS63_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943543/SRR7943543_1.fastq.gz -o SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943543/SRR7943543_2.fastq.gz -o SRR7943543_16S_V4_of_human_feces_PBS39_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943538/SRR7943538_1.fastq.gz -o SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943538/SRR7943538_2.fastq.gz -o SRR7943538_16S_V4_of_human_feces_PBS49_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943535/SRR7943535_1.fastq.gz -o SRR7943535_16S_V4_of_human_feces_PBS30_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943535/SRR7943535_2.fastq.gz -o SRR7943535_16S_V4_of_human_feces_PBS30_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943537/SRR7943537_1.fastq.gz -o SRR7943537_16S_V4_of_human_feces_PBS50_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943537/SRR7943537_2.fastq.gz -o SRR7943537_16S_V4_of_human_feces_PBS50_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943536/SRR7943536_1.fastq.gz -o SRR7943536_16S_V4_of_human_feces_PBS29_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943536/SRR7943536_2.fastq.gz -o SRR7943536_16S_V4_of_human_feces_PBS29_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943533/SRR7943533_1.fastq.gz -o SRR7943533_16S_V4_of_human_feces_PBS44_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943533/SRR7943533_2.fastq.gz -o SRR7943533_16S_V4_of_human_feces_PBS44_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943534/SRR7943534_1.fastq.gz -o SRR7943534_16S_V4_of_human_feces_PBS67_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943534/SRR7943534_2.fastq.gz -o SRR7943534_16S_V4_of_human_feces_PBS67_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943531/SRR7943531_1.fastq.gz -o SRR7943531_16S_V4_of_human_feces_PBS26_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943531/SRR7943531_2.fastq.gz -o SRR7943531_16S_V4_of_human_feces_PBS26_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943532/SRR7943532_1.fastq.gz -o SRR7943532_16S_V4_of_human_feces_PBS25_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943532/SRR7943532_2.fastq.gz -o SRR7943532_16S_V4_of_human_feces_PBS25_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943530/SRR7943530_1.fastq.gz -o SRR7943530_16S_V4_of_human_feces_PBS27_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943530/SRR7943530_2.fastq.gz -o SRR7943530_16S_V4_of_human_feces_PBS27_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943529/SRR7943529_1.fastq.gz -o SRR7943529_16S_V4_of_human_feces_PBS28_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943529/SRR7943529_2.fastq.gz -o SRR7943529_16S_V4_of_human_feces_PBS28_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943528/SRR7943528_1.fastq.gz -o SRR7943528_16S_V4_of_human_feces_PBS21_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943528/SRR7943528_2.fastq.gz -o SRR7943528_16S_V4_of_human_feces_PBS21_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943527/SRR7943527_1.fastq.gz -o SRR7943527_16S_V4_of_human_feces_PBS22_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943527/SRR7943527_2.fastq.gz -o SRR7943527_16S_V4_of_human_feces_PBS22_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943525/SRR7943525_1.fastq.gz -o SRR7943525_16S_V4_of_human_feces_PBS24_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943525/SRR7943525_2.fastq.gz -o SRR7943525_16S_V4_of_human_feces_PBS24_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943524/SRR7943524_1.fastq.gz -o SRR7943524_16S_V4_of_human_feces_PBS62_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943524/SRR7943524_2.fastq.gz -o SRR7943524_16S_V4_of_human_feces_PBS62_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943521/SRR7943521_1.fastq.gz -o SRR7943521_16S_V4_of_human_feces_PBS47_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943521/SRR7943521_2.fastq.gz -o SRR7943521_16S_V4_of_human_feces_PBS47_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943523/SRR7943523_1.fastq.gz -o SRR7943523_16S_V4_of_human_feces_PBS42_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943523/SRR7943523_2.fastq.gz -o SRR7943523_16S_V4_of_human_feces_PBS42_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943526/SRR7943526_1.fastq.gz -o SRR7943526_16S_V4_of_human_feces_PBS23_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943526/SRR7943526_2.fastq.gz -o SRR7943526_16S_V4_of_human_feces_PBS23_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943522/SRR7943522_1.fastq.gz -o SRR7943522_16S_V4_of_human_feces_PBS41_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943522/SRR7943522_2.fastq.gz -o SRR7943522_16S_V4_of_human_feces_PBS41_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943515/SRR7943515_1.fastq.gz -o SRR7943515_16S_V4_of_human_feces_PBS6_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943515/SRR7943515_2.fastq.gz -o SRR7943515_16S_V4_of_human_feces_PBS6_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943517/SRR7943517_1.fastq.gz -o SRR7943517_16S_V4_of_human_feces_PBS46_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943517/SRR7943517_2.fastq.gz -o SRR7943517_16S_V4_of_human_feces_PBS46_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943518/SRR7943518_1.fastq.gz -o SRR7943518_16S_V4_of_human_feces_PBS45_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943518/SRR7943518_2.fastq.gz -o SRR7943518_16S_V4_of_human_feces_PBS45_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943516/SRR7943516_1.fastq.gz -o SRR7943516_16S_V4_of_human_feces_PBS38_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943516/SRR7943516_2.fastq.gz -o SRR7943516_16S_V4_of_human_feces_PBS38_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943519/SRR7943519_1.fastq.gz -o SRR7943519_16S_V4_of_human_feces_PBS48_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943519/SRR7943519_2.fastq.gz -o SRR7943519_16S_V4_of_human_feces_PBS48_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943520/SRR7943520_1.fastq.gz -o SRR7943520_16S_V4_of_human_feces_PBS57_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943520/SRR7943520_2.fastq.gz -o SRR7943520_16S_V4_of_human_feces_PBS57_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943513/SRR7943513_1.fastq.gz -o SRR7943513_16S_V4_of_human_feces_PBS8_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943513/SRR7943513_2.fastq.gz -o SRR7943513_16S_V4_of_human_feces_PBS8_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943509/SRR7943509_1.fastq.gz -o SRR7943509_16S_V4_of_human_feces_PBS4_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943509/SRR7943509_2.fastq.gz -o SRR7943509_16S_V4_of_human_feces_PBS4_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943511/SRR7943511_1.fastq.gz -o SRR7943511_16S_V4_of_human_feces_PBS2_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943511/SRR7943511_2.fastq.gz -o SRR7943511_16S_V4_of_human_feces_PBS2_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943510/SRR7943510_1.fastq.gz -o SRR7943510_16S_V4_of_human_feces_PBS1_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943510/SRR7943510_2.fastq.gz -o SRR7943510_16S_V4_of_human_feces_PBS1_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943514/SRR7943514_1.fastq.gz -o SRR7943514_16S_V4_of_human_feces_PBS34_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943514/SRR7943514_2.fastq.gz -o SRR7943514_16S_V4_of_human_feces_PBS34_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943512/SRR7943512_1.fastq.gz -o SRR7943512_16S_V4_of_human_feces_PBS33_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943512/SRR7943512_2.fastq.gz -o SRR7943512_16S_V4_of_human_feces_PBS33_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943506/SRR7943506_1.fastq.gz -o SRR7943506_16S_V4_of_human_feces_PBS32_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943506/SRR7943506_2.fastq.gz -o SRR7943506_16S_V4_of_human_feces_PBS32_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943507/SRR7943507_1.fastq.gz -o SRR7943507_16S_V4_of_human_feces_PBS10_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943507/SRR7943507_2.fastq.gz -o SRR7943507_16S_V4_of_human_feces_PBS10_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943508/SRR7943508_1.fastq.gz -o SRR7943508_16S_V4_of_human_feces_PBS3_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943508/SRR7943508_2.fastq.gz -o SRR7943508_16S_V4_of_human_feces_PBS3_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943503/SRR7943503_1.fastq.gz -o SRR7943503_16S_V4_of_human_feces_PBS59_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943503/SRR7943503_2.fastq.gz -o SRR7943503_16S_V4_of_human_feces_PBS59_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943504/SRR7943504_1.fastq.gz -o SRR7943504_16S_V4_of_human_feces_PBS60_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943504/SRR7943504_2.fastq.gz -o SRR7943504_16S_V4_of_human_feces_PBS60_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943505/SRR7943505_1.fastq.gz -o SRR7943505_16S_V4_of_human_feces_PBS9_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943505/SRR7943505_2.fastq.gz -o SRR7943505_16S_V4_of_human_feces_PBS9_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943499/SRR7943499_1.fastq.gz -o SRR7943499_16S_V4_of_human_feces_PBS54_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943499/SRR7943499_2.fastq.gz -o SRR7943499_16S_V4_of_human_feces_PBS54_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943500/SRR7943500_1.fastq.gz -o SRR7943500_16S_V4_of_human_feces_PBS36_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943500/SRR7943500_2.fastq.gz -o SRR7943500_16S_V4_of_human_feces_PBS36_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943502/SRR7943502_1.fastq.gz -o SRR7943502_16S_V4_of_human_feces_PBS31_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943502/SRR7943502_2.fastq.gz -o SRR7943502_16S_V4_of_human_feces_PBS31_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943497/SRR7943497_1.fastq.gz -o SRR7943497_16S_V4_of_human_feces_PBS56_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/007/SRR7943497/SRR7943497_2.fastq.gz -o SRR7943497_16S_V4_of_human_feces_PBS56_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943501/SRR7943501_1.fastq.gz -o SRR7943501_16S_V4_of_human_feces_PBS52_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943501/SRR7943501_2.fastq.gz -o SRR7943501_16S_V4_of_human_feces_PBS52_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943498/SRR7943498_1.fastq.gz -o SRR7943498_16S_V4_of_human_feces_PBS53_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943498/SRR7943498_2.fastq.gz -o SRR7943498_16S_V4_of_human_feces_PBS53_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943495/SRR7943495_1.fastq.gz -o SRR7943495_16S_V4_of_human_feces_PBS58_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/005/SRR7943495/SRR7943495_2.fastq.gz -o SRR7943495_16S_V4_of_human_feces_PBS58_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943496/SRR7943496_1.fastq.gz -o SRR7943496_16S_V4_of_human_feces_PBS55_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/006/SRR7943496/SRR7943496_2.fastq.gz -o SRR7943496_16S_V4_of_human_feces_PBS55_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943492/SRR7943492_1.fastq.gz -o SRR7943492_16S_V4_of_human_feces_PBS15_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/002/SRR7943492/SRR7943492_2.fastq.gz -o SRR7943492_16S_V4_of_human_feces_PBS15_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943493/SRR7943493_1.fastq.gz -o SRR7943493_16S_V4_of_human_feces_PBS16_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943493/SRR7943493_2.fastq.gz -o SRR7943493_16S_V4_of_human_feces_PBS16_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943494/SRR7943494_1.fastq.gz -o SRR7943494_16S_V4_of_human_feces_PBS37_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943494/SRR7943494_2.fastq.gz -o SRR7943494_16S_V4_of_human_feces_PBS37_2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943491/SRR7943491_1.fastq.gz -o SRR7943491_16S_V4_of_human_feces_PBS18_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943491/SRR7943491_2.fastq.gz -o SRR7943491_16S_V4_of_human_feces_PBS18_2.fastq.gz
+```
+
+
+---
+
+2. **Pre-processed QIIME2 files** (*optional*)
+
+(*optional*)
+
+Pre-processed QIIME2 sequence data as outlined in [sequence processing](2.1seqProcessing.html) is available for download on [FigShare link](https://figshare.com/s/0c459524e59953bf2585). 
+
+You can view the downloaded `qzv` files using [QIIME2 view](https://view.qiime2.org/).
+
+---
+
+3.  **RData** (*REQUIRED*)
+
+The easiest way to follow along with this tutorial is to download this GitHub repository using either option **1** or **2** below:
+
+1.  Go to <https://github.com/siobhon-egan/2022-systMed-genomics> and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
+
+2.  Use terminal and clone the GitHub repo.
+
+```
+git clone https://github.com/siobhon-egan/2022-systMed-genomics.git
+```
+
+## Install R packages
+
+You should only need to do this once to install required libraries.
+
+I recommend you run this bit of code line by line. (i.e. copy and paste one line of code directly in to the console and press enter).      
+For some reason running the whole script at once doesn't seem to be working.      
+Also the order of installing the packages is important, please sick to this order.
+
+Remember it assumes you have R version 4.0 and RStudio version 1.4.
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+# Phyloseq
+BiocManager::install("phyloseq")
+# Tidyverse
+install.packages("tidyverse")
+# Install microbiome
+BiocManager::install("microbiome")
+# Install microbiome utilities
+install.packages("devtools")
+devtools::install_github("microsud/microbiomeutilities")
+# Install DirichletMultinomial
+BiocManager::install("DirichletMultinomial")
+# Install MicrobiotaProcess
+BiocManager::install("MicrobiotaProcess")
+# Install ampvis2
+install.packages("remotes")
+remotes::install_github("MadsAlbertsen/ampvis2")
+# Install vegan
+install.packages("vegan")
+# Install tidyverse
+install.packages("tidyverse")
+# Install ggpubr
+install.packages("ggpubr")
+# R color brewer
+install.packages("RColorBrewer")
+# Install reshape2
+install.packages("reshape2")
+# Install plotly
+install.packages("plotly")
+```
+
+Note I have not included packages that relating to "knitting" the document here. Everything should be executable within the R markdown files by running the code chunks.

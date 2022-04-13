@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Data visualization</title>
+
+<script src="site_libs/header-attrs-2.11.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="assets/mystyle.css" type="text/css" />
+<link rel="stylesheet" href="assets/murdoch-fonts.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Systems Medicine</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 513
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="01seqProcessing.html">Sequence processing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 514
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="2.introBIO514.html">Introduction</a>
+    </li>
+    <li>
+      <a href="2.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="2.1seqProcessing.html">Sequence processing</a>
+    </li>
+    <li>
+      <a href="2.2dataCleaning.html">Data Cleaning</a>
+    </li>
+    <li>
+      <a href="2.3dataViz.html">Data visualization</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/siobhon-egan/2022-systMed-genomics">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Data visualization</h1>
+<h3 class="subtitle">Visualization of microbiome data</h3>
+
+</div>
+
+
+<div id="load-libraries" class="section level2">
+<h2>Load libraries</h2>
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.align = &quot;center&quot;)</code></pre>
+<p>Load and/or install required R packages.</p>
+<pre class="r"><code>pkgs &lt;- c(&quot;tidyverse&quot;, &quot;phyloseq&quot;, &quot;ggpubr&quot;, &quot;ggplot2&quot;,
+          &quot;vegan&quot;, &quot;reshape2&quot;, &quot;plotly&quot;, &quot;microbiomeutilities&quot;, &quot;ampvis2&quot;,
+          &quot;MicrobiotaProcess&quot;, &quot;microbiome&quot;, &quot;DirichletMultinomial&quot;)
+lapply(pkgs, require, character.only = TRUE)
+theme_set(theme_bw())</code></pre>
+</div>
+<div id="data-import" class="section level2">
+<h2>Data import</h2>
+<p>This data is <code>phyloseq</code> format. This is the most commonly used data format for amplicon data in RStudio. As we have skipped over getting our data into R, here are some help links on this matter <a href="https://joey711.github.io/phyloseq/import-data.html">phyloseq</a> and customised <a href="https://cryptick-lab.github.io/NGS-Analysis/_site/QIIME2-DataImport.html">tutorial here</a>.</p>
+<p>Essentially we need at least three bits of data that talk to each other:</p>
+<ul>
+<li><strong>Count data</strong> - sometimes called OTU data. Usually OTUs/ASVs are rows and each column is sample. Data is numerical where value = number of sequences. Note that different outputs may have data transformed (i.e rows are the samples), make sure you check what format data is required in.</li>
+<li><strong>Taxonomy data</strong> - this contains the taxonomy of the count (or OTU) data. Each row is a unique OTU/ASV and column reflect <strong>Kingdom, Phylum, Class, Order, Family, Genus, Species</strong>.</li>
+<li><strong>Sample data</strong> - sometimes referred to as metadata. This includes all the additional information on samples e.g. sample variables such as collection time, patient age, disease status etc.</li>
+</ul>
+<p><em>Optional data</em></p>
+<ul>
+<li><strong>Phylogenetic tree</strong> - usually as newick format but other options available. For some beta-diversity analysis this is required</li>
+<li><strong>Ref sequences</strong> - sequences of OTUs or ASV (as <code>.fasta</code> format)</li>
+</ul>
+<p>Load data in RData - downloaded from <a href="https://github.com/ka-west/PBS_manuscript" class="uri">https://github.com/ka-west/PBS_manuscript</a></p>
+<pre class="r"><code>load(&quot;data/BIO514/PBS_data.Rdata&quot;)
+# Quick glance at phyloseq object
+ps_M</code></pre>
+<pre><code>## phyloseq-class experiment-level object
+## otu_table()   OTU Table:         [ 4318 taxa and 68 samples ]
+## sample_data() Sample Data:       [ 68 samples by 15 sample variables ]
+## tax_table()   Taxonomy Table:    [ 4318 taxa by 6 taxonomic ranks ]
+## phy_tree()    Phylogenetic Tree: [ 4318 tips and 4316 internal nodes ]</code></pre>
+</div>
+<div id="inspect-data" class="section level2">
+<h2>Inspect data</h2>
+<p><strong>Number of reads</strong></p>
+<p>This will give you an overview of the number of reads per sample and per OTU. Important to know the ‘depth’ of sequencing. Generally for amplicon 16S microbiome you want many 10’s of thousands of (good reads) per sample. The more complex the sample the more reads you need (but there is a very large variation in studies and not set rule).</p>
+<pre class="r"><code>readsumsdf = data.frame(nreads = sort(taxa_sums(ps_M), TRUE), sorted = 1:ntaxa(ps_M), 
+    type = &quot;OTUs&quot;)
+readsumsdf = rbind(readsumsdf, data.frame(nreads = sort(sample_sums(ps_M), 
+    TRUE), sorted = 1:nsamples(ps_M), type = &quot;Samples&quot;))
+title = &quot;Total number of reads&quot;
+nreads = ggplot(readsumsdf, aes(x = sorted, y = nreads)) + geom_bar(stat = &quot;identity&quot;)
+nreads = nreads + ggtitle(title) + scale_y_log10() + facet_wrap(~type, 1, scales = &quot;free&quot;)
+nreads</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><strong>Read density plot</strong><br />
+Useful for QC purposes. This will show you the distribution of sequencing depth among samples. Ideally you want an even number of reads per sample. If you see lots of variation then library preparation needs to be optimised and you will need to perform more thorough data cleaning (i.e. rarefy reads - but this is not ideal).<br />
+Ref: McMurdie PJ, Holmes S. Waste not, want not: why rarefying microbiome data is inadmissible. PLoS Comput Biol. 2014 3;10(4):e1003531. doi: <a href="10.1371/journal.pcbi.1003531">https://doi.org/10.1371/journal.pcbi.1003531</a>.</p>
+<pre class="r"><code>read_distrib &lt;- plot_read_distribution(ps_M, groups = &quot;Group&quot;, 
+                                       plot.type = &quot;density&quot;)
+read_distrib</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="rarefaction" class="section level2">
+<h2>Rarefaction</h2>
+<p>Rarefaction is a technique to assess species richness from the results of sampling - mainly used in ecology. This curve is a plot of the number of species as a function of the number of samples. Rarefaction curves generally grow rapidly at first, as the most common species are found, but the curves plateau as only the rarest species remain to be sampled. We use this plot to see if we have reached an adequate level of sequencing depth for our samples.</p>
+<pre class="r"><code># set seed
+set.seed(1)
+# set subsample
+subsamples = c(10, 5000, 10000, 20000, 30000)
+rarecurve &lt;- plot_alpha_rcurve(ps_M, index=&quot;observed&quot;, 
+                       subsamples = subsamples,
+                       lower.conf = 0.025, 
+                       upper.conf = 0.975,
+                       group=&quot;Group_label&quot;,
+                       label.color = &quot;brown3&quot;,
+                       label.size = 3,
+                       label.min = TRUE) 
+# change color of line 
+mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+rarecurve &lt;- rarecurve + scale_color_manual(values = mycols) + 
+  scale_fill_manual(values = mycols)
+rarecurve</code></pre>
+<div class="figure" style="text-align: center">
+<img src="2.3dataViz_files/figure-html/unnamed-chunk-4-1.png" alt="Rarefaction of final taxonomic data from microbiome analysis" width="1152" />
+<p class="caption">
+Rarefaction of final taxonomic data from microbiome analysis
+</p>
+</div>
+</div>
+<div id="alpha-diversity" class="section level2">
+<h2>Alpha diversity</h2>
+<p>Alpha diversity is the mean species diversity within a sample. There are different measurements/indexes. The most simplest being how many ASV/OTUs in each sample. Other common used measurements - chao1, shannon, inverse simpson,</p>
+<p>Make using alpha diversity plots with statistical values using <a href="https://microsud.github.io/microbiomeutilities/articles/microbiomeutilities.html#plot-alpha-diversities">microbiomeutilities</a>.</p>
+<p>Produce alpha diversity plots using 6 measures.</p>
+<p>The reason we produce so many measures is that we might want to compare with various papers which might report on different measures.</p>
+<pre class="r"><code>alpha_meas = c(&quot;Observed&quot;, &quot;Chao1&quot;, &quot;ACE&quot;, &quot;Shannon&quot;, &quot;Simpson&quot;, &quot;InvSimpson&quot;)
+p &lt;- plot_richness(ps_M, &quot;Group_label&quot;, measures = alpha_meas)
+
+alphadiv &lt;-
+  p + geom_boxplot(data = p$data,
+                   aes(x = Group_label, y = value, fill = Group_label),
+                   alpha = 0.1) + theme_bw() + 
+  theme(axis.text.x = element_text(size = 8, angle = 90)) +
+  theme(axis.title.x = element_blank()) +
+  scale_fill_manual(values=c(&quot;brown3&quot;, &quot;steelblue&quot;))
+alphadiv</code></pre>
+<div class="figure" style="text-align: center">
+<img src="2.3dataViz_files/figure-html/unnamed-chunk-5-1.png" alt="Alpha diveristy analysis using Observed, Chao1, ACE, Shannon, Simpson and Inverse Simpson metrics" width="1152" />
+<p class="caption">
+Alpha diveristy analysis using Observed, Chao1, ACE, Shannon, Simpson and Inverse Simpson metrics
+</p>
+</div>
+<p>Save your figures directly from R for bonus points on quality data reproducibility! This line with save your combined alpha diversity plots into a directory called <em>plots/</em></p>
+<pre><code>ggsave(&quot;alphadiv.pdf&quot;, plot = alphadiv, path = &quot;plots&quot;, 
+       width = 30, height = 30, units = &quot;cm&quot;)</code></pre>
+</div>
+<div id="distribution-plot" class="section level2">
+<h2>Distribution plot</h2>
+<p>This plot is good to give you an idea of the how taxa are distribution within the data. It will give you an idea about general trends in the data and help guide how further analysis.</p>
+<pre class="r"><code># Bariatric Surgery
+NBS_ps &lt;- subset_samples(ps_M, Group_label==&quot;NBS&quot;)
+NBS_ps_dis &lt;- taxa_distribution(NBS_ps) + 
+  theme_biome_utils() + 
+  labs(title = &quot;No Bariatric Surgery&quot;)
+# Malabsorptive
+MAL_ps &lt;- subset_samples(ps_M, Group_label==&quot;MAL&quot;)
+MAL_ps_dis &lt;- taxa_distribution(MAL_ps) + 
+  theme_biome_utils() + 
+  labs(title = &quot;Malabsorptive&quot;)</code></pre>
+<p>Merge the plots together for publication ready figures</p>
+<pre class="r"><code>distrib = ggarrange(NBS_ps_dis, MAL_ps_dis, ncol = 1, nrow = 2)
+distrib</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="taxa-summary" class="section level2">
+<h2>Taxa summary</h2>
+<p>Create a bar plot of phyla - showing difference in two groups <code>No bariatric surgery</code> vs <code>Malabsorptive</code>. Note that depending on your study present a barplot might a quick way to see patterns in your data generally they are not used to represent the community composition in your final figures.</p>
+<p>Use these for visualizing at higher taxonomic levels (mostly phylum level). Remember also that you need to be careful when looking at relative microbiome abundance!</p>
+<pre class="r"><code>mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+grp_abund &lt;- get_group_abundances(ps_M, 
+                                  level = &quot;Phylum&quot;, 
+                                  group=&quot;Group&quot;,
+                                  transform = &quot;compositional&quot;)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## An additonal column Sam_rep with sample names is created for reference purpose</code></pre>
+<pre class="r"><code>mean.plot.phy &lt;- grp_abund %&gt;% # input data
+  ggplot(aes(x= reorder(OTUID, mean_abundance), # reorder based on mean abundance
+             y= mean_abundance,
+             fill=Group)) + # x and y axis
+  geom_bar(stat = &quot;identity&quot;,
+           position=position_dodge()) + 
+  scale_fill_manual(&quot;Group&quot;, values=mycols) + # manually specify colors
+  theme_bw() + # add a widely used ggplot2 theme
+  ylab(&quot;Mean Relative Abundance&quot;) + # label y axis
+  xlab(&quot;Phylum&quot;) + # label x axis
+  coord_flip() # rotate plot 
+mean.plot.phy</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Create a bar plot of order - showing difference in two groups <code>No bariatric surgery</code> vs <code>Malabsorptive</code></p>
+<pre class="r"><code>mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+grp_abund &lt;- get_group_abundances(ps_M, 
+                                  level = &quot;Order&quot;, 
+                                  group=&quot;Group&quot;,
+                                  transform = &quot;compositional&quot;)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## An additonal column Sam_rep with sample names is created for reference purpose</code></pre>
+<pre class="r"><code>mean.plot.ord &lt;- grp_abund %&gt;% # input data
+  ggplot(aes(x= reorder(OTUID, mean_abundance), # reorder based on mean abundance
+             y= mean_abundance,
+             fill=Group)) + # x and y axis 
+  geom_bar(stat = &quot;identity&quot;,
+           position=position_dodge()) + 
+  scale_fill_manual(&quot;Group&quot;, values=mycols) + # manually specify colors
+  theme_bw() + # add a widely used ggplot2 theme
+  ylab(&quot;Mean Relative Abundance&quot;) + # label y axis
+  xlab(&quot;Order&quot;) + # label x axis
+  coord_flip() # rotate plot 
+mean.plot.ord</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><strong>Composition barplot</strong></p>
+<p>To quickly visualize comparison in taxa between make a relative abundance barplot of taxa between sample group (aggregate taxa at family level).</p>
+<pre class="r"><code># Get relative abundance and remove low abundant taxa
+ps1.rel &lt;- microbiome::transform(ps_M, &quot;compositional&quot;)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre class="r"><code>ps1.fam.rel &lt;-aggregate_rare(ps1.rel, level = &quot;Family&quot;, detection = 0.005, prevalence = 0.5)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;
+## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre class="r"><code>comp_plot &lt;- plot_composition(ps1.fam.rel,
+                      average_by = &quot;Group_label&quot;) + 
+  guides(fill = guide_legend(ncol = 1)) + 
+  labs(x = &quot;Samples&quot;, 
+       y = &quot;Relative abundance&quot;,
+       title = &quot;Relative abundance data&quot;) +
+  scale_fill_brewer(&quot;Family&quot;, palette = &quot;Paired&quot;)
+comp_plot</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="top-taxa" class="section level2">
+<h2>Top taxa</h2>
+<p>Now we’ll just take the top 5 family taxa. Lets plot the abundance between the two groups. Make some comments on the value of this type of analysis and how you might interpret the data (tell me also about the type of bacteria that were identified as well).</p>
+<pre class="r"><code>mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+top_tax &lt;- plot_taxa_boxplot(ps_M,
+                        taxonomic.level = &quot;Family&quot;,
+                        top.otu = 6, 
+                        group = &quot;Group_label&quot;,
+                        add.violin= TRUE,
+                        group.colors = mycols,
+                        title = &quot;Top six family&quot;, 
+                        keep.other = FALSE,
+                        dot.size = 1)</code></pre>
+<pre><code>## For plotting purpuses the phy_tree will be removed</code></pre>
+<pre class="r"><code>top_tax</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="heatmap" class="section level2">
+<h2>Heatmap</h2>
+<p>Rather than a barplot heatmaps are much better at presenting the microbiome composition in samples. These are commonly used in publications!</p>
+<p>Create heatmap of core microbiome <a href="https://microbiome.github.io/tutorials/Core.html">tutorial</a></p>
+<p>Keep only taxa with count above zero and transform to compositional (relative abundance).</p>
+<pre class="r"><code>ps.prune &lt;- prune_taxa(taxa_sums(ps_M) &gt; 0, ps_M)
+pseq.rel &lt;- microbiome::transform(ps.prune, &quot;compositional&quot;)</code></pre>
+<p>Aggregate data to genus level and make heat map of the most prevalent taxa.</p>
+<pre class="r"><code>library(RColorBrewer)
+ps.m3.rel.gen &lt;- aggregate_taxa(pseq.rel, &quot;Genus&quot;)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre class="r"><code>prevalences &lt;- seq(.05, 1, .05)
+detections &lt;- 10^seq(log10(1e-4), log10(.2), length = 10)
+core_heatmap &lt;- plot_core(ps.m3.rel.gen, 
+                plot.type = &quot;heatmap&quot;, 
+                colours = rev(brewer.pal(5, &quot;RdBu&quot;)),
+                prevalences = prevalences, 
+                detections = detections, min.prevalence = .5) +
+  xlab(&quot;Detection Threshold (Relative Abundance (%))&quot;)</code></pre>
+<pre><code>##  [1] &quot;0.01%&quot;               &quot;0.0232691816877636%&quot; &quot;0.0541454816418154%&quot;
+##  [4] &quot;0.125992104989487%&quot;  &quot;0.293173318222417%&quot;  &quot;0.682190320772197%&quot; 
+##  [7] &quot;1.5874010519682%&quot;    &quot;3.69375234895952%&quot;   &quot;8.59505945175427%&quot;  
+## [10] &quot;20%&quot;</code></pre>
+<pre class="r"><code>core_heatmap</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-12-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>Make a heat map of all samples - this can get a bit messy when you have a lot of samples but helpful to quickly see how different samples compare.</p>
+<pre class="r"><code>ps1.rel &lt;-aggregate_rare(ps_M, level = &quot;Family&quot;, detection = 10, prevalence = 0.5)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre class="r"><code>pseq.famlog &lt;- microbiome::transform(ps1.rel, &quot;log10&quot;)
+p.famrel.heatmap &lt;- plot_composition(pseq.famlog, 
+                             sample.sort = NULL, 
+                             otu.sort = NULL, 
+                             x.label = &quot;Group_label&quot;, 
+                             plot.type = &quot;heatmap&quot;, 
+                             verbose = FALSE)
+p.famrel.heatmap</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-13-1.png" width="1536" style="display: block; margin: auto;" /></p>
+<p>To view interactively execute the following R code. <code>ggplotly(p.famrel.heatmap)</code></p>
+</div>
+<div id="betadiversity" class="section level2">
+<h2>Betadiversity</h2>
+<p>Variation of microbial communities between samples. Beta diversity shows the different between microbial communities from different environments.</p>
+<p><strong>Distance measures </strong> Bray–Curtis dissimilarity - based on abundance or read count data - differences in microbial abundances between two samples (e.g., at species level) values are from 0 to 1 0 means both samples share the same species at exact the same abundances 1 means both samples have complete different species abundances</p>
+<p>Jaccard distance - based on presence or absence of species (does not include abundance information) - different in microbial composition between two samples 0 means both samples share exact the same species 1 means both samples have no species in common</p>
+<p>UniFrac - sequence distances (phylogenetic tree) - based on the fraction of branch length that is shared between two samples or unique to one or the other sample unweighted UniFrac: purely based on sequence distances (does not include abundance information) weighted UniFrac: branch lengths are weighted by relative abundances (includes both sequence and abundance information)</p>
+<ul>
+<li><a href="https://joey711.github.io/phyloseq/plot_ordination-examples.html">Phyloseq</a></li>
+<li><a href="http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html#constrained_ordinations">MicrobiomeMiseq tutorial by Michelle Berr</a></li>
+<li><a href="http://albertsenlab.org/ampvis2-ordination/">ampvis2</a></li>
+</ul>
+<div id="ordination" class="section level3">
+<h3>Ordination</h3>
+<p>Ordination methods are used to highlight differences between samples based on their microbial community composition - also referred to as distance- or (dis)similarity measures.</p>
+<p>These techniques reduce the dimensionality of microbiome data sets so that a summary of the beta diversity relationships can be visualized in 2D or 3D plots. The principal coordinates (axis) each explains a certain fraction of the variability (formally called inertia). This creates a visual representation of the microbial community compositional differences among samples. Observations based on ordination plots can be substantiated with statistical analyses that assess the clusters.</p>
+<p>There are many options for ordination. Broadly they can be broken into:</p>
+<ol style="list-style-type: decimal">
+<li>Implicit and Unconstrained (exploratory)
+<ul>
+<li>Principal Components Analysis (PCA) using Euclidean distance</li>
+<li>Correspondence Analysis (CA) using Pearson chi-squared</li>
+<li>Detrended Correspondence Analysis (DCA) using chi-square</li>
+</ul></li>
+<li>Implicit and Constrained (explanatory)
+<ul>
+<li>Redundancy Analysis (RDA) using Euclidean distance</li>
+<li>Canonical Correspondance Analysis (CCA) using Pearson chi-squared</li>
+</ul></li>
+<li>Explicit and Unconstrained (exploratory)
+<ul>
+<li>Principal Coordinates Analysis (PCoA)</li>
+<li>non-metric Multidimensional Scaling (nMDS)</li>
+<li>Choose your own distance measure - Bray-Curtis - takes into account abundance (in this case abundance is the number of reads) - Pearson chi-squares - statistical test on randomness of differences - Jaccard - presence/absence - Chord - UniFrac, which incorporates phylogeny. - <em>note</em>: if you set the distance metric to Euclidean then PCoA becomes Principal Components Analysis.</li>
+</ul></li>
+</ol>
+<p><strong>Some extra explanatory notes on PCoA and nMDS</strong></p>
+<p>PCoA is very similar to PCA, RDA, CA, and CCA in that they are all based on eigenan analysis: each of the resulting axes is an eigen vector associated with an eigen value, and all axes are orthogonal to each other. This means that all axes reveal unique information about the inertia in the data, and exactly how much inertia is indicated by the eigenvalue. When plotting the ordination result in an x/y scatterplot, the axis with the largest eigenvalue is plotted on the first axis, and the one with the second largest on the second axis.</p>
+<p>NMDS attempts to represent the pairwise dissimilarity between objects in a low-dimensional space. Can use any dissimilarity coefficient or distance measure. NMDS is a rank-based approach based on an iterative algorithm. While information about the magnitude of distances is lost, rank-based methods are generally more robust to data which do not have an identifiable distribution. NMDS routines often begin by random placement of data objects in ordination space. The algorithm then begins to refine this placement by an iterative process, attempting to find an ordination in which ordinated object distances closely match the order of object dissimilarities in the original distance matrix. The stress value reflects how well the ordination summarizes the observed distances among the samples.</p>
+<div id="detrended-correspondence-analysis-dca" class="section level4">
+<h4>Detrended correspondence analysis (DCA)</h4>
+<p><code>Implicit and Unconstrained (exploratory)</code></p>
+<p>Ordination of samples using DCA. Leave distance blank, so default is chi-square.</p>
+<pre class="r"><code># Ordinate the data
+set.seed(4235421)
+mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+# proj &lt;- get_ordination(pseq, &quot;MDS&quot;, &quot;bray&quot;)
+ord.dca &lt;- ordinate(ps_M, &quot;DCA&quot;)
+ord_DCA = plot_ordination(ps_M, ord.dca, color = &quot;Group_label&quot;) +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse()
+ord_DCA</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="canonical-correspondence-analysis-cca" class="section level4">
+<h4>Canonical correspondence analysis (CCA)</h4>
+<p><code>Implicit and Constrained (explanatory)</code></p>
+<p>Ordination of samples using CCA methods using Pearson chi-squared. Constrained variable used as <code>Group_label</code>.</p>
+<pre class="r"><code>mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+pseq.cca &lt;- ordinate(ps_M, &quot;CCA&quot;, cca = &quot;Group_label&quot;)
+ord_CCA &lt;- plot_ordination(ps_M, pseq.cca, color = &quot;Group_label&quot;)
+ord_CCA &lt;- ord_CCA + geom_point(size = 4) + 
+  scale_color_manual(values=mycols) + stat_ellipse()
+ord_CCA</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="redundancy-analysis-rda" class="section level4">
+<h4>Redundancy analysis (RDA)</h4>
+<p><code>Implicit and Constrained (explanatory)</code></p>
+<p>Ordination of samples using RDA methods using Euclidean distance. Constrained variable used as <code>Group_label</code>.</p>
+<pre class="r"><code>mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+pseq.rda &lt;- ordinate(ps_M, &quot;RDA&quot;, cca = &quot;Group_label&quot;)
+ord_RDA &lt;- plot_ordination(ps_M, pseq.rda, color = &quot;Group_label&quot;)
+ord_RDA &lt;- ord_RDA + geom_point(size = 4) + 
+  scale_color_manual(values=mycols) + stat_ellipse()
+ord_RDA</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="principal-coordinates-analysis-pcoa" class="section level4">
+<h4>Principal Coordinates Analysis (PCoA)</h4>
+<p>PCoA is very similar to PCA, RDA, CA, and CCA in that they are all based on eigenanalysis: each of the resulting axes is an eigenvector associated with an eigenvalue, and all axes are orthogonal to each other. This means that all axes reveal unique information about the inertia in the data, and exactly how much inertia is indicated by the eigenvalue.</p>
+<p>Ordination of samples using PCoA methods and <strong>jaccard</strong> (presence/absence) distance measure</p>
+<pre class="r"><code># Ordinate the data
+set.seed(4235421)
+mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+# proj &lt;- get_ordination(pseq, &quot;MDS&quot;, &quot;bray&quot;)
+ord.pcoa.jac &lt;- ordinate(ps_M, &quot;PCoA&quot;, &quot;jaccard&quot;)
+ord_PCoA_jac = plot_ordination(ps_M, ord.pcoa.jac, color = &quot;Group_label&quot;) +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse()
+ord_PCoA_jac</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ordination of samples using PCoA methods and <strong>bray curtis</strong> (abundance) distance measure.</p>
+<pre class="r"><code># Ordinate the data
+set.seed(4235421)
+mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+ord.pcoa.bray &lt;- ordinate(ps_M, &quot;PCoA&quot;, &quot;bray&quot;)
+ord_PCoA_bray = plot_ordination(ps_M, ord.pcoa.bray, color = &quot;Group_label&quot;) +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse()
+ord_PCoA_bray</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="principal-coordinates-analysis-pcoa-with-unifrac" class="section level4">
+<h4>Principal Coordinates Analysis (PCoA) with unifrac</h4>
+<p>Unifrac analysis takes into account not only the differences in OTUs/ASVs but also takes into account the phylogeny of the taxa. I.e. how closely related are the taxa.</p>
+<p>We can perform unweighted (using presence/absence abundance like jaccard) or weighted (incorporating abundance data - like bray curtis).</p>
+<p><em>Unweighted unifrac</em></p>
+<pre class="r"><code># Ordinate the data
+set.seed(4235421)
+mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+ord_pcoa_ufuw &lt;- ordinate(ps_M, &quot;PCoA&quot;, &quot;unifrac&quot;, weighted=FALSE)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre class="r"><code>ord_PCoA_ufuw = plot_ordination(ps_M, ord_pcoa_ufuw, color = &quot;Group_label&quot;, shape=&quot;Time_point&quot;) +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse()
+ord_PCoA_ufuw</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><em>Weighted unifrac</em></p>
+<pre class="r"><code>mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+ord_pcoa_ufw = ordinate(ps_M, &quot;PCoA&quot;, &quot;unifrac&quot;, weighted=TRUE)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre class="r"><code>ord_PCoA_ufw = plot_ordination(ps_M, ord_pcoa_ufw, color=&quot;Group_label&quot;, shape=&quot;Time_point&quot;)
+ord_PCoA_ufw &lt;- ord_PCoA_ufw + geom_point(size = 4) + 
+  scale_color_manual(values=mycols) + stat_ellipse()
+ord_PCoA_ufw</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="non-metric-multidimensional-scaling-nmds" class="section level4">
+<h4>Non-metric Multidimensional Scaling (nMDS)</h4>
+<p>Finally lets perform ordination using Non-metric Multidimensional Scaling. We’ll use the unifrac distance measure which takes into account phylogeny and also the <code>WEIGHTED</code> option.</p>
+<pre class="r"><code># Ordinate the data
+set.seed(4235421)
+mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+ord_nmds_ufw &lt;- ordinate(ps_M, &quot;NMDS&quot;, &quot;unifrac&quot;, weighted=TRUE)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Run 0 stress 0.1465875 
+## Run 1 stress 0.1697601 
+## Run 2 stress 0.1466427 
+## ... Procrustes: rmse 0.01918481  max resid 0.1376383 
+## Run 3 stress 0.177508 
+## Run 4 stress 0.1697601 
+## Run 5 stress 0.2015363 
+## Run 6 stress 0.1465878 
+## ... Procrustes: rmse 0.000134178  max resid 0.001004719 
+## ... Similar to previous best
+## Run 7 stress 0.1466427 
+## ... Procrustes: rmse 0.01926118  max resid 0.1382319 
+## Run 8 stress 0.1466427 
+## ... Procrustes: rmse 0.01925229  max resid 0.1381674 
+## Run 9 stress 0.1465874 
+## ... New best solution
+## ... Procrustes: rmse 0.0002624536  max resid 0.001966408 
+## ... Similar to previous best
+## Run 10 stress 0.1465875 
+## ... Procrustes: rmse 0.00003078451  max resid 0.0002298629 
+## ... Similar to previous best
+## Run 11 stress 0.1818785 
+## Run 12 stress 0.1869773 
+## Run 13 stress 0.1474098 
+## Run 14 stress 0.1465873 
+## ... New best solution
+## ... Procrustes: rmse 0.00009571418  max resid 0.0007180497 
+## ... Similar to previous best
+## Run 15 stress 0.1474098 
+## Run 16 stress 0.1474098 
+## Run 17 stress 0.177508 
+## Run 18 stress 0.1474098 
+## Run 19 stress 0.2004568 
+## Run 20 stress 0.1465875 
+## ... Procrustes: rmse 0.0001422936  max resid 0.001067589 
+## ... Similar to previous best
+## *** Solution reached</code></pre>
+<pre class="r"><code>ord_NMDS_ufw = plot_ordination(ps_M, ord_nmds_ufw, color = &quot;Group_label&quot;, shape=&quot;Time_point&quot;) +
+                geom_point(size = 5) + scale_color_manual(values=mycols) + stat_ellipse()
+ord_NMDS_ufw</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="statistical-analysis" class="section level3">
+<h3>Statistical analysis</h3>
+<p>Here we’ll perform a statistical analysis on beta diversity.</p>
+<p>See tutorial <a href="https://mibwurrepo.github.io/Microbial-bioinformatics-introductory-course-Material-2018/beta-diversity-metrics.html#permanova">here</a>.</p>
+<p>Differences by <code>Group_label</code> using ANOVA</p>
+<pre class="r"><code># Transform data to hellinger
+pseq.rel &lt;- microbiome::transform(ps_M, &quot;hellinger&quot;)</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre><code>## Found more than one class &quot;phylo&quot; in cache; using the first, from namespace &#39;phyloseq&#39;</code></pre>
+<pre><code>## Also defined by &#39;tidytree&#39;</code></pre>
+<pre class="r"><code># Pick relative abundances (compositional) and sample metadata 
+otu &lt;- abundances(pseq.rel)
+meta &lt;- meta(pseq.rel)
+# samples x SampleCategory as input
+permanova &lt;- adonis(t(otu) ~ Group_label,
+                    data = meta, permutations=999, method = &quot;bray&quot;)
+## statistics
+print(as.data.frame(permanova$aov.tab)[&quot;Group_label&quot;, &quot;Pr(&gt;F)&quot;])</code></pre>
+<pre><code>## [1] 0.001</code></pre>
+<pre class="r"><code>dist &lt;- vegdist(t(otu))
+mod &lt;- betadisper(dist, meta$Group_label)
+### ANOVA - are groups different 
+anova(betadisper(dist, meta$Group_label))</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: Distances
+##           Df   Sum Sq   Mean Sq F value  Pr(&gt;F)  
+## Groups     1 0.009817 0.0098173  6.9784 0.01029 *
+## Residuals 66 0.092850 0.0014068                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+</div>
+<div id="hierarchical-cluster-analysis" class="section level2">
+<h2>Hierarchical cluster analysis</h2>
+<p>Beta diversity metrics can assess the differences between microbial communities. It can be visualized with PCA or PCoA, this can also be visualized with hierarchical clustering.</p>
+<p>Function from <a href="https://bioconductor.org/packages/devel/bioc/vignettes/MicrobiotaProcess/inst/doc/MicrobiotaProcess-basics.html">MicrobiotaProcess</a> using analysis based on <a href="https://yulab-smu.top/treedata-book/">ggtree</a>.</p>
+<pre class="r"><code>## All samples - detailed, include species and SampleCategory
+clust_all &lt;- get_clust(obj=ps_M, distmethod=&quot;euclidean&quot;,
+                      method=&quot;hellinger&quot;, hclustmethod=&quot;average&quot;)
+mycols &lt;- c(&quot;brown3&quot;, &quot;steelblue&quot;)
+# circular layout
+clust_all_plot &lt;- ggclust(obj=clust_all ,
+                      layout = &quot;circular&quot;,
+                      pointsize=3,
+                      fontsize=0,
+                      factorNames=c(&quot;Group_label&quot;, &quot;Time_point_label&quot;)) +
+  scale_color_manual(values=mycols) +
+  scale_shape_manual(values=c(17, 15, 16)) + 
+  ggtitle(&quot;Hierarchical Cluster of All Samples (euclidean)&quot;)
+clust_all_plot</code></pre>
+<p><img src="2.3dataViz_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+
+<hr> 
+<div class="logos"><img src="assets/squaremu.png" width="50px" align="right"></div>
+
+<br></br>
+
+<p style="text-align: center;"><span style="color: #4F5556;"><em>Copyright, Siobhon Egan, 2022.</em></span></p>
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Add font awesome icons -->
+<p style="text-align: center;">
+    <a href="https://github.com/siobhon-egan/BIO510-microbiome" class="fa fa-github"></a>
+</p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

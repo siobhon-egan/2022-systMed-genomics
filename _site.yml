@@ -1,0 +1,39 @@
+name: "Systems Medicine | 2022"
+output_dir: docs
+navbar:
+  title: "Systems Medicine"
+  left:
+    - text: "Home"
+      icon: fa-home
+      href: index.html
+    - text: "BIO 513"
+      icon: fas fa-book-open
+      menu:
+       - text: "Sequence processing"
+         href: 01seqProcessing.html   
+    - text: "BIO 514"
+      icon: fas fa-book-open
+      menu:
+       - text: "Introduction"
+         href: 2.introBIO514.html
+       - text: "Set up"
+         href: 2.setup.html
+       - text: "-----------"
+       - text: "Sequence processing"
+         href: 2.1seqProcessing.html
+       - text: "Data Cleaning"
+         href: 2.2dataCleaning.html
+       - text: "Data visualization"
+         href: 2.3dataViz.html      
+  right:
+  - icon: fab fa-github
+    href: https://github.com/siobhon-egan/2022-systMed-genomics
+output:
+  html_document:
+    css: ["assets/mystyle.css", "assets/murdoch-fonts.css"]
+    toc: true
+    toc_float:
+      collapsed: false
+    include:
+      in_header: assets/header.html
+      after_body: assets/footer.html

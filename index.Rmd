@@ -1,0 +1,29 @@
+---
+title: "Systems Medicine 2022"
+---
+
+Content for Systems Medicine genomics lectures/workshops.
+
+![](assets/ANPC.png)
+
+---
+
+## BIO 514 Workshop - Microbiome bioinformatic analysis
+
+| Content        | Link           |
+| ------------------- |:--------------------:|
+| *SLIDES*     | [link](BIO514-workshop_slides/skeleton.html)  |
+| Introduction      | [link](2.introBIO514.html)  |
+| Set up and resources      | [link](2.setup.html)  |
+| Sequence processing      | [link](2.1seqProcessing.html)      |
+| Data cleaning | [link](2.2dataCleaning.html)      |
+| Data visualization | [link](2.3dataViz.html)      |
+
+---
+
+## BIO 513 Lecture and Workshop - Genomics data
+
+| Content        | Link           |
+| ------------------- |:--------------------:|
+
+
