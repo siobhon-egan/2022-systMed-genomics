@@ -1,12 +1,15 @@
-# BIO514
+# 2022 Systems Medicine genomics
 
-Material for teaching BIO514 microbiome related components
+Material for teaching in Systems Medicine post-graduate course - genomics related components
 
-Website: https://siobhonlegan.com/2022-BIO514-microbiome
+Website: http://siobhonlegan.com/2022-systMed-genomics/
 
-Updated: 
+## BIO513
 
----
+- [Genomics data lecture and workshop]()
 
-## Software
 
+## BIO514
+
+- [Microbiome data analysis workshop](http://siobhonlegan.com/2022-systMed-genomics/2.introBIO514.html)
+- [Multi-omic data integration]()
