@@ -12,7 +12,7 @@ Content for BIO514 microbiome data analysis workshop 2022.
 
 | Content        | Link           |
 | ------------------- |:--------------------:|
-| SLIDES      | [link](BIO514-workshop_slides/skeleton.html)  |
+| SLIDES      | [link](BIO514-microbiome-slides/skeleton.html)  |
 | Introduction      | [link](2.introBIO514.html)  |
 | Set up and resources      | [link](2.setup.html)  |
 | Sequence processing      | [link](2.1seqProcessing.html)      |
