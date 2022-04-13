@@ -1,3 +1,5 @@
 .DS_Store
 .Rproj.user/
 tmp/
+data/ngs/pacbio/*
+data/ngs/illumina/*.fastq.gz

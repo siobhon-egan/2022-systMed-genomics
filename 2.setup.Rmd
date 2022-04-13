@@ -1,5 +1,5 @@
 ---
-title: "Set up"
+title: "BIO514 Set up"
 ---
 
 ```{r, include=FALSE}

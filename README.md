@@ -4,12 +4,26 @@ Material for teaching in Systems Medicine post-graduate course - genomics relate
 
 Website: http://siobhonlegan.com/2022-systMed-genomics/
 
-## BIO513
+## BIO 513 Lecture and Workshop - Genomics data
 
-- [Genomics data lecture and workshop]() | Thursday 14th April 2022
+>Thursday 14th April 2022
+
+| Content        | Link           |
+| ------------------- |:--------------------:|
+| Set up     | [link](1.setup.html)  |
+| Sequence data      | [link](1.1seqData.html)      |
+| Sequence processing      | [link](1.2seqProcessing.html)      |
 
 
-## BIO514
+## BIO 514 Workshop - Microbiome bioinformatic analysis
 
-- [Microbiome data analysis workshop](http://siobhonlegan.com/2022-systMed-genomics/2.introBIO514.html) | Wednesday 13th April 2022.
-- [Multi-omic data integration]()
+>Wednesday 13th April 2022
+
+| Content        | Link           |
+| ------------------- |:--------------------:|
+| *SLIDES*     | [link](BIO514-microbiome-slides/skeleton.html)  |
+| Introduction      | [link](2.introBIO514.html)  |
+| Set up and resources      | [link](2.setup.html)  |
+| Sequence processing      | [link](2.1seqProcessing.html)      |
+| Data cleaning | [link](2.2dataCleaning.html)      |
+| Data visualization | [link](2.3dataViz.html)      |

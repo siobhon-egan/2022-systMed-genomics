@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Sequence processing</title>
+
+<script src="site_libs/header-attrs-2.11.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="assets/mystyle.css" type="text/css" />
+<link rel="stylesheet" href="assets/murdoch-fonts.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Systems Medicine</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 513
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="1.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="1.1seqData.html">Sequence data</a>
+    </li>
+    <li>
+      <a href="1.2seqProcessing.html">Sequence Processing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 514
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="2.introBIO514.html">Introduction</a>
+    </li>
+    <li>
+      <a href="2.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="2.1seqProcessing.html">Sequence processing</a>
+    </li>
+    <li>
+      <a href="2.2dataCleaning.html">Data Cleaning</a>
+    </li>
+    <li>
+      <a href="2.3dataViz.html">Data visualization</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/siobhon-egan/2022-systMed-genomics">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Sequence processing</h1>
+
+</div>
+
+
+<div id="outline" class="section level1">
+<h1>OUTLINE</h1>
+<p>This lecture will provide an introduction in the data types and analysis for genomics. The advent of high-throughput sequencing platforms has resulted in large volumes of data being produced. It important to know how to manage and interpret this data in a reproducible way.</p>
+<p>This lecture will cover the following aspects:</p>
+<ol style="list-style-type: decimal">
+<li>Sequence data and databases</li>
+</ol>
+<ul>
+<li>Databases and online resources for genomics</li>
+<li>Common sequence data file formats (e.g. <code>.fastq</code>, <code>.fasta</code>, <code>.bam</code>, <code>fast5</code>)</li>
+<li>What data is contained in files and how to interpret information</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Tools for analyzing data</li>
+</ol>
+<ul>
+<li>Tools to query, inspect, visualize sequence files</li>
+<li>Demultiplexing, merging, trimming and quality filtering</li>
+<li>Discuss methods of assembly/clustering in the different contexts of sequence data
+<ul>
+<li>Amplicon sequencing (clustering/denoising into taxonomic units)</li>
+<li>Shotgun sequencing (assembling contigs and scaffolds)</li>
+</ul></li>
+<li>Be familat with both Unix shell and R environment (inc. packages) for sequence data</li>
+</ul>
+<!--
+In this lecture we will cover data file formats including:`.fastq`, `.fasta`, `.bam`, `fast5`.
+We will discuss how they relate to the various sequence platforms and what information they provide.
+The lecture will then discuss the following aspects
+
+Assess sequence quality
+Map sequence data onto a reference genome
+Perform de novo assembly tasks
+Quantify sequence data
+Integrate biological context with sequence information
+
+1.Sequence data
+- Databases and online resources for sequence data
+- Learn the common sequence data file formats
+- Learn the common sequence data file formats
+2.Tools for sequencing data
+- Tools to query, inspect, visualize an aligned sequence file
+- Learn the contents of sequence data files
+- Learn to generate sequencing metrics and to process sequence data
+- Learn about Python and R libraries/packages to read sequence data
+-->
+</div>
+<div id="set-up" class="section level1">
+<h1>Set up</h1>
+<blockquote>
+<p>Important note: lessons outlined here are designed in the context of delivery through the BIO513 unit RStudio/google cloud server.</p>
+</blockquote>
+<p>Please navigate to the RStudio server and login with your details provided earlier in the unit.</p>
+<p>Create a new Rmarkdown file by doing to <strong>File &gt; New File &gt; R Markdown …</strong></p>
+<p>See the <a href="1.setup.html">setup</a> page for details on obtaining data.</p>
+<hr />
+<div id="the-basics" class="section level2">
+<h2>The basics</h2>
+<table>
+<caption>IUPAC Nucleotide abbreviations</caption>
+<tbody>
+<tr class="odd">
+<td><strong>Letter</strong></td>
+<td><strong>Nucleotide</strong></td>
+</tr>
+<tr class="even">
+<td>A</td>
+<td>Adenine</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>Cytosine</td>
+</tr>
+<tr class="even">
+<td>G</td>
+<td>Guanine</td>
+</tr>
+<tr class="odd">
+<td>T (or U)</td>
+<td>Thymine (or Uracil)</td>
+</tr>
+<tr class="even">
+<td>R</td>
+<td>A or G</td>
+</tr>
+<tr class="odd">
+<td>Y</td>
+<td>C or T</td>
+</tr>
+<tr class="even">
+<td>S</td>
+<td>G or C</td>
+</tr>
+<tr class="odd">
+<td>W</td>
+<td>A or T</td>
+</tr>
+<tr class="even">
+<td>K</td>
+<td>G or T</td>
+</tr>
+<tr class="odd">
+<td>M</td>
+<td>A or C</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>C or G or T</td>
+</tr>
+<tr class="odd">
+<td>D</td>
+<td>A or G or T</td>
+</tr>
+<tr class="even">
+<td>H</td>
+<td>A or C or T</td>
+</tr>
+<tr class="odd">
+<td>V</td>
+<td>A or C or G</td>
+</tr>
+<tr class="even">
+<td>N</td>
+<td>any base</td>
+</tr>
+<tr class="odd">
+<td>. or -</td>
+<td>gap</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n50" class="section level2">
+<h2>N50</h2>
+<p>The N metrics are a measure of contiguity of a set of sequences often used to assess genome assemblies.</p>
+<p>The N50 is related to the median and mean length of a set of sequences. Its value represents the length of the shortest read in the group of longest sequences that together represent (at least) 50% of the nucleotides in the set of sequences.</p>
+<p><strong>Example: Six reads of length 10, 11, 12, 13, 14, 15, 16. The combined length is 81 nucleotides and 50% = 40.5 nucleotides.</strong></p>
+<p>To get the N50 value start at the longest read and add the length of the next shorter one until you reach (at least) 50% of the total number of nucleotides:</p>
+<pre><code>    16 + 15 + 14 = 45</code></pre>
+<p>The N50 value of this set of sequences is 14.</p>
+<p>The N50 value can be seen as a weighted midpoint of the read length distribution of a sequencing run. However, the N50 value has to be interpreted in context of the total number of reads in a sequencing run. For example, a large number of very short reads may not have a big impact on the N50 value of a sequencing run but would arguably be worse than a sequencing run with less reads and similar N50 value.</p>
+<p>Another common metric is the N90 value, representing the shortest read in the group of longest reads that together represent 90% of all the nucleotides.</p>
+<p>In the example above the N90 value is 10.</p>
+<p>N50-values alone can be mis-leading are on its own is not a useful measure to assess the quality of an assembly. For example, the assmblies with the following contig lengths have the same N50 although one is more contiguous than the other:</p>
+<ul>
+<li><p>3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 25, 25, 150, 1500</p></li>
+<li><p>50, 500, 530, 650</p></li>
+</ul>
+<p>As shown above, many short reads in an assembly may not affect the N50 which is one of the reasons why the N50 (alone) is not a useful metric to assess or compare assembly qualities.</p>
+<blockquote>
+<svg viewBox="0 0 192 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M176 432c0 44.112-35.888 80-80 80s-80-35.888-80-80 35.888-80 80-80 80 35.888 80 80zM25.26 25.199l13.6 272C39.499 309.972 50.041 320 62.83 320h66.34c12.789 0 23.331-10.028 23.97-22.801l13.6-272C167.425 11.49 156.496 0 142.77 0H49.23C35.504 0 24.575 11.49 25.26 25.199z"></path>
+</svg>
+<p>N50 values alone can be mis-leading and should not be used <em>alone</em> to assess the quality of an assembly. As shown below, many short reads in an assembly may not affect the N50 which is one of the reasons why the N50 (alone) is not a useful metric to assess or compare assembly qualities.</p>
+</blockquote>
+<pre><code>Example: the assemblies with the following contig lengths have the same N50 although one is more contiguous than the other:
+
+#   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 25, 25, 150, 1500
+#   50, 500, 530, 650</code></pre>
+</div>
+<div id="file-formats" class="section level2">
+<h2>File formats</h2>
+<div id="fastq" class="section level3">
+<h3>FASTQ</h3>
+<p>The FASTQ format is the standard format for lightly-processed data coming off an Illumina machine. A FASTQ files typically used the extensions <code>.fq</code> or <code>.fastq</code>. Almost all FASTQ files you get from a sequencer should be gzipped to save space. Thus, in order to view the file you will have to uncompress it. Since you would, in most circumstances, want to visually inspect just a few lines, it is best to do that with gzcat and pipe the output to head.</p>
+<p>As we have seen, paired-end sequencing produces two separate reads of a DNA fragment. Those two different reads are usually stored in two separate files named in such a manner as to transparently denote whether it contains sequences obtained from read 1 or read 2. For example <code>bird_08_B03_R1.fq.gz</code> and <code>bird_08_B03_R2.fq.gz</code>. Read 1 and Read 2 from a paired read must occupy the sames lines in their respective files, i.e., lines 10001-10004 in <code>bird_08_B03_R1.fq.gz</code> and lines 10001-10004 in <code>bird_08_B03_R2.fq.gz</code> should both pertain to the same DNA fragment that was sequenced.</p>
+<p>That is what is meant by “paired-end” sequencing: the sequences come in pairs from different ends of the same fragment.</p>
+<p>The FASTQ format is very simple: information about each read occupies just four lines. This means that the number of lines in a proper <code>FASTQ</code> file must always be a multiple of four. Briefly, the four lines of information about each read are always in the same order as follows:</p>
+<p>The fastq format is the de-facto standard of 2nd generation sequencing technology such as Illumina sequencers. It is similar to the fasta format but in addition to the sequence itself a fastq file also stores quality scores of the sequence. A fastq file stores every sequence in exactly 4 lines (see Figure @(fig:Ffastq):</p>
+<ol style="list-style-type: decimal">
+<li><p>The name/ID line starting with “@” followed by a sequence identifier</p></li>
+<li><p>The sequence itself</p></li>
+<li><p>A line starting with “+” (optionally followed by additional information, e.g., the read names again) which is an artifact that can be ignored nowadays</p></li>
+<li><p>The quality line with one character per sequence residue encoding the probability of a possible sequencing error (<a href="https://github.com/timkahlke/LongRead_tutorials/blob/master/docs/APP_MET.md#phred-score">Phred score</a>)</p></li>
+</ol>
+<div class="figure">
+<img src="images/fastqPic.png" alt="FASTQ format and a brief explanation of each line in the format." width="95%" />
+<p class="caption">
+FASTQ format and a brief explanation of each line in the format.
+</p>
+</div>
+<table>
+<thead>
+<tr class="header">
+<th>Phred Quality Score</th>
+<th>Probability of incorrect base call</th>
+<th>Base call accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10</td>
+<td>1 in 10</td>
+<td>90%</td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td>1 in 100</td>
+<td>99%</td>
+</tr>
+<tr class="odd">
+<td>30</td>
+<td>1 in 1.000</td>
+<td>99.9%</td>
+</tr>
+<tr class="even">
+<td>40</td>
+<td>1 in 10,000</td>
+<td>99.99%</td>
+</tr>
+</tbody>
+</table>
+<pre class="bash"><code># unzip file
+gunzip data/ngs/illumina/SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq.gz
+
+# inspect file
+head data/ngs/illumina/SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq
+
+# zip back up
+gzip data/ngs/illumina/SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq</code></pre>
+</div>
+<div id="fast5" class="section level3">
+<h3>FAST5</h3>
+<p>The <code>FAST5</code> format is the standard sequencing output for Oxford Nanopore sequencers such as the MinION. Oxford nanopore raw data is a direct measurement of the changes in ionic current as a DNA/RNA strand passes through the pore, this information is recorded by the MinKNOW software. MinKNOW also processes the signal into “reads”, each read corresponding to a single strand of DNA/RNA. These reads are optionally written out as .<code>fast5</code> files. It is based on the <em>hierarchical data format</em> <a href="https://en.wikipedia.org/wiki/Hierarchical_Data_Format">HDF5</a> format which enables storage of large and complex data. In contrast to <code>fasta</code> and <code>fastq</code> files a <code>FAST5</code> file is binary and can not be opened with a normal text editor. These .fast5 files use the HDF5 format to store data (<a href="http://www.hdfgroup.org/HDF5/" class="uri">http://www.hdfgroup.org/HDF5/</a>); libraries exist to read and write these in many popular computer languages (e.g. R, Python, Perl, C, C++, Java).</p>
+<p>Data stored in nanopore <code>FAST5</code> files can contain the sequence of a read in <code>fastq</code> format (after basecalling), the raw signal of the pore as well as several log files and other information.</p>
+<p><em>Basecalling</em> - the raw signal is further processed by the basecalling algorithm to generate the base sequence of the read (i.e. string of nucleotide bases). Basecalling is made up of a series of steps that are executed one by one. Ionic current measurements from the sequencing device are collected by the MinKNOW software and processed into a read. The reads are transformed into basecalls using mathematical models. The results of these analyses are written into <code>FASTQ</code> files, with a default of 4000 reads per <code>FASTQ</code> file. Alternatively, the user can select a .<code>fast5</code> file output for additional information about the raw signal (similarly, the default is 4000 reads per .<code>fast5</code> file).</p>
+</div>
+<div id="fasta" class="section level3">
+<h3>FASTA</h3>
+<p>The fasta format was invented in 1988 and designed to represent nucleotide or peptide sequences. It originates from the FASTA software package, but is now a standard in the world of bioinformatics.</p>
+<p>The first line starts with a “&gt;” (greater-than) symbol followed by the description or identifier of the sequence. The second line is then the actual sequence itself in standard one-letter code.</p>
+<p>The FASTQ format, described above, is tailored for representing short DNA sequences—and their associated quality scores—that have been generated from high-throughput sequencing machines. A simpler, leaner format is used to represent longer DNA sequences that have typically been established from a lot of sequencing, and which no longer travel with their quality scores. This is the FASTA format, which you will typically see storing the DNA sequence from reference genomes. FASTA files typically use the file extensions <code>.fa</code>, <code>.fasta</code>, or <code>.fna</code>, the latter denoting it as a FASTA file of nucleotides.</p>
+<p>In an ideal world, a reference genome would contain a single, uninterrupted sequence of DNA for every chromosome. While the resources for some well-studied species include “chromosomal-level assemblies” which have much sequence organized into chromosomes in a FASTA file, even these genome assemblies often include a large number of short fragments of sequence that are known to belong to the species, but whose location and orientation in the genome remain unknown.</p>
+<p>More often, in conservation genetics, the reference genome for an organism you are working on might be the product of a recent, small-scale, assembly of a low-coverage genome. In this case, the genome may be represented by thousands, or tens of thousands, of scaffolds, only a few of which might be longer than one or a few megabases. All of these scaffolds go into the FASTA file of the reference genome.</p>
+<pre><code>    &gt;KX580312.1 Homo sapiens truncated breast cancer 1 (BRCA1) gene, exon 15 and partial cds
+    GTCATCCCCTTCTAAATGCCCATCATTAGATGATAGGTGGTACATGCACAGTTGCTCTGGGAGTCTTCAG
+    AATAGAAACTACCCATCTCAAGAGGAGCTCATTAAGGTTGTTGATGTGGAGGAGTAACAGCTGGAAGAGT
+    CTGGGCCACACGATTTGACGGAAACATCTTACTTGCCAAGGCAAGATCTAG</code></pre>
+</div>
+<div id="bam" class="section level3">
+<h3>BAM</h3>
+<p>The BAM format is a binary, compressed, record-oriented container format for raw or aligned sequence reads. The associated SAM format is a text representation of the same data. The <a href="http://samtools.github.io/hts-specs/SAMv1.pdf">specifications for BAM/SAM</a> are maintained by the SAM/BAM Format Specification Working Group.</p>
+<p>As of the 3.0 release of SMRTanalysis, PacBio is embracing the industry standard BAM format for (both aligned and unaligned) basecall data files. We have also formulated a BAM companion file format (bam.pbi) enabling fast access to a richer set of per-read information as well as compatibility for software built around the legacy cmp.h5 format.</p>
+<p>PacBio-produced BAM files are fully compatible with the BAM specification. In this document we describe the way we make use of the extensibility mechanisms of the BAM specification to encode PacBio-specific information, as well as conventions we adhere to.</p>
+<p>More detail available from PacBio <a href="https://pacbiofileformats.readthedocs.io/en/9.0/BAM.html#version" class="uri">https://pacbiofileformats.readthedocs.io/en/9.0/BAM.html#version</a></p>
+</div>
+</div>
+<div id="sequence-data-databases-and-online-resources" class="section level2">
+<h2>Sequence Data: Databases and Online Resources</h2>
+<p>Data repositories - useful when curated!</p>
+<p><strong>BLAST</strong> is a software tool for searching similarity in nucleotide sequences (DNA) and/or amino acid (protein) sequences.</p>
+<ul>
+<li>similarity search of nucleotide or amino acid sequences</li>
+<li>allows gaps (deletions and insertions)</li>
+<li>local alignment: detect regions (subsequences) that are similar between two compared sequences</li>
+<li>homology search of gene or protein sequences. For short read mapping see bowtie2 or BWA.</li>
+</ul>
+<p><a href="https://blast.ncbi.nlm.nih.gov/">NCBI</a></p>
+<ul>
+<li>Sequence Read Archive - upload raw sequence data</li>
+<li>Genbank - upload clean nucleotide sequence data</li>
+</ul>
+<p>The <strong>European Nucleotide Archive</strong> is a repository providing free and unrestricted access to annotated DNA and RNA sequences. It also stores complementary information such as experimental procedures, details of sequence assembly and other metadata related to sequencing projects.</p>
+<p><a href="https://www.ebi.ac.uk/ena/browser/">ENA</a></p>
+<ul>
+<li>Sequence search</li>
+<li>Text/keyword search</li>
+</ul>
+<blockquote>
+<p>Your turn at BLAST-ING and we will explore the web output together now.</p>
+</blockquote>
+<p>Copy the first <code>fasta</code> sequence in the file below and paste into <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi">BLAST</a>.</p>
+<pre class="bash"><code>head data/ngs/refseqs.fasta</code></pre>
+<pre><code>## &gt;GATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCGCATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAA
+## GATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTG
+## CTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTC
+## TTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCGCATGTTCAC
+## ATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTA
+## ACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAAC
+## TGAGACACGGTCCAA
+## &gt;GATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGAACTTAGCTTGCTAAGTTTGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGATGACTCGGGGATAGCCTTTCGAAAGAAAGATTAATACCCGATGGCATAGTTCTTCCGCATGGTAGAACTATTAAAGAATTTCGGTCATCGATGGGGATGCGTTCCATTAGGTTGTTGGCGGGGTAACGGCCCACCAAGCCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAA
+## GATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGAACTTAGCTTG
+## CTAAGTTTGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGATGACTC</code></pre>
+</div>
+<div id="sequence-alignment" class="section level2">
+<h2>Sequence alignment</h2>
+<p>Why is multiple sequence alignment difficult?</p>
+<p>If sequences are all the same length, alignment is trivial:</p>
+<pre><code>    KNMITGAAQMDGAILVVAATDGPMPQTREHVLLARQVEVP
+    KNMITGAAQMDGAILVVSATDGAMPQTKEHILLARQVGVP
+    KNMITGAAQMDGAILVVSATDGAMPQTKEHILLARQVGVP
+    KNMITGAAQMDGAILVVSAADGPMPQTREHILLARQVGVP</code></pre>
+<p>This sequence alignment is unambiguous because there is no length variation among the sequences. No indels are needed to make the alignment, and the ungapped sequences can simply be arranged together. However, if the sequenes are of various lengths, problem is more complex, potentially very complex:</p>
+<pre><code>    RGSALKAVEAPNDPNHEA......YKPIQELLDAMDN.....YIPDPQRDVDKPFL
+    RGSALKALEGDAAYIEKVR..........ELMQAVDD.....NIPTPEREIDKPFL
+    RGSALKALE.....IEKVR..........ELMQAGDAAYVDDNIPTPEREIDKPFL
+    RGSALLALEEMHKNPKTKRGENEWVDKIWELLDAIDE.....YIPTPVRDVDKPFL
+    RGSALLALEQMHRNPKTRRGENEWVDKIWELLDAIDE.....YIPTPVRDVDKPFL
+    KGSALQALEALQANPKTARGEDKWVDRIWELLDAVDS.....YIPTPERATDKTFL
+    RGTARNALESPSKDIN....APEY.KCILELMNAVDE.....YIPTPQRAVDQPFL
+    KGSALQALE....NAE....DEEKTKCIWELLQAMDD.....YIPAPERDIDKPFL
+    KGSAFGAMS....NPE....DPESTKCVKELLESMDN.....YFDLPERDIDKPFL
+    RGSAFAAMS....KPD....DPAATKCLDELLDTMDK.....YFVIPERALDKPFL</code></pre>
+<p>In many cases the best position to place an indel is ambiguous. Ideally, one would know the phylogeny for the sequences; this would help infer the sequence of indels. Unfortunately one normally needs a multiple sequence alignment to make inferences about how the sequences are related. Most alignment algorithms make a quick approximation of phylogeny, and then base alignments on these. Sound circular? You are right and this is a challenging problem that is at the forefront of research in phylogenetics…the joint estimation of the alignment and phylogeny. For this class we will stick to the traditional method of first aligning sequences followed by phylogenetic analysis.</p>
+<p>Progressive alignment methods are efficient enough to implement on a large scale for many (100s to 1000s) sequences. Progressive alignment services are commonly available on publicly accessible web servers so users need not locally install the applications of interest. The most popular progressive alignment method has been the Clustal family Different portals or implementations can vary in user interface and make different parameters accessible to the user. Clustal Omega is used extensively for phylogenetic tree construction.</p>
+<p>The basic steps in Clustal are:</p>
+<ol style="list-style-type: decimal">
+<li>Calculate all possible pairwise alignments, record the score for each pair</li>
+<li>Calculate a guide tree based on the pairwise distances (algorithm: Neighbor Joining)</li>
+<li>Find the two most closely related sequences</li>
+<li>Align these sequences (algorithm: Smith-Waterman).
+<ol style="list-style-type: lower-alpha">
+<li>Calculate a consensus of this alignment</li>
+<li>Replace the two sequences with the consensus</li>
+<li>Find the two next-most closely related sequences (one of these could be a previously determined consensus sequence).</li>
+<li>Iterate until all sequences have been aligned</li>
+</ol></li>
+<li>Expand the consensus sequences with the (gapped) original sequences</li>
+<li>Report the multiple sequence alignment</li>
+</ol>
+<div id="software-for-sequence-alignment" class="section level3">
+<h3>Software for sequence alignment</h3>
+<p>There are many tools available for sequence alignment. The common tools are hosting at the European Bioinformatics Institute.</p>
+<ul>
+<li><a href="https://www.ebi.ac.uk/Tools/psa/">Pairwise sequence alignment</a></li>
+<li><a href="https://www.ebi.ac.uk/Tools/msa/">Multiple sequence alignment</a></li>
+</ul>
+<p>The most commonly used are Clustal, Muscle and MAFFT. MAFFT is commonly implemented for working with large data sets and where speed is important (e.g. web servers)</p>
+</div>
+</div>
+</div>
+
+<hr> 
+<div class="logos"><img src="assets/squaremu.png" width="50px" align="right"></div>
+
+<br></br>
+
+<p style="text-align: center;"><span style="color: #4F5556;"><em>Copyright, Siobhon Egan, 2022.</em></span></p>
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Add font awesome icons -->
+<p style="text-align: center;">
+    <a href="https://github.com/siobhon-egan/BIO510-microbiome" class="fa fa-github"></a>
+</p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Sequence processing in R</title>
+
+<script src="site_libs/header-attrs-2.11.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="assets/mystyle.css" type="text/css" />
+<link rel="stylesheet" href="assets/murdoch-fonts.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Systems Medicine</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 513
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="1.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="1.1seqData.html">Sequence data</a>
+    </li>
+    <li>
+      <a href="1.2seqProcessing.html">Sequence Processing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 514
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="2.introBIO514.html">Introduction</a>
+    </li>
+    <li>
+      <a href="2.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="2.1seqProcessing.html">Sequence processing</a>
+    </li>
+    <li>
+      <a href="2.2dataCleaning.html">Data Cleaning</a>
+    </li>
+    <li>
+      <a href="2.3dataViz.html">Data visualization</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/siobhon-egan/2022-systMed-genomics">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Sequence processing in R</h1>
+
+</div>
+
+
+<p><strong>Links</strong></p>
+<ul>
+<li><a href="https://a-little-book-of-r-for-bioinformatics.readthedocs.io/">Welcome to a Little Book of R for Bioinformatics!</a></li>
+<li><a href="https://compgenomr.github.io/book/">Computational Genomics with R</a></li>
+<li><a href="http://www.sthda.com/english/wiki/genomics">sthda genomics wiki</a></li>
+<li><a href="http://bioconductor.org/help/course-materials/2019/BiocAsia/02-Workshop.html">bioconductor - R and Bioconductor for Genomic Analysis</a> -<a href="http://bioconductor.org/help/course-materials/2019/CSAMA/lab-1-intro-to-r-bioc.html">bioconductor - Introduction to R and Bioconductor</a></li>
+<li><a href="http://genomicsclass.github.io/book/">Biomedical Data Science</a></li>
+</ul>
+<div id="libraries" class="section level2">
+<h2>Libraries</h2>
+<p><em>Install packages</em> - do this as we are talking, it might take a while</p>
+<pre class="r"><code>if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+BiocManager::install(&quot;dada2&quot;)
+
+if (!requireNamespace(&quot;BiocManager&quot;, quietly=TRUE))
+install.packages(&quot;BiocManager&quot;)
+BiocManager::install(&quot;msa&quot;)
+
+if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+BiocManager::install(&quot;Biostrings&quot;)
+
+install.packages(&quot;ape&quot;)
+install.packages(&quot;seqinr&quot;)</code></pre>
+<p>Load libraries</p>
+<pre class="r"><code>## load dada2 package
+library(dada2); packageVersion(&quot;dada2&quot;)</code></pre>
+<pre><code>## Loading required package: Rcpp</code></pre>
+<pre class="r"><code>## load seqinr package
+library(seqinr)
+
+## load msa package
+library(msa)</code></pre>
+<pre><code>## Loading required package: Biostrings</code></pre>
+<pre><code>## Loading required package: BiocGenerics</code></pre>
+<pre><code>## 
+## Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     anyDuplicated, append, as.data.frame, basename, cbind, colnames,
+##     dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+##     grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
+##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+##     rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
+##     union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>## Loading required package: S4Vectors</code></pre>
+<pre><code>## Loading required package: stats4</code></pre>
+<pre><code>## 
+## Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     expand.grid, I, unname</code></pre>
+<pre><code>## Loading required package: IRanges</code></pre>
+<pre><code>## Loading required package: XVector</code></pre>
+<pre><code>## Loading required package: GenomeInfoDb</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Biostrings&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:seqinr&#39;:
+## 
+##     translate</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     strsplit</code></pre>
+<pre class="r"><code>## load Biostrings package
+library(Biostrings)
+
+# load ape package
+library(ape)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ape&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:Biostrings&#39;:
+## 
+##     complement</code></pre>
+<pre><code>## The following objects are masked from &#39;package:seqinr&#39;:
+## 
+##     as.alignment, consensus</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
+## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+## ✓ readr   2.1.2     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x ggplot2::%+%()      masks crayon::%+%()
+## x dplyr::collapse()   masks Biostrings::collapse(), IRanges::collapse()
+## x dplyr::combine()    masks BiocGenerics::combine()
+## x purrr::compact()    masks XVector::compact()
+## x dplyr::count()      masks seqinr::count()
+## x dplyr::desc()       masks IRanges::desc()
+## x tidyr::expand()     masks S4Vectors::expand()
+## x dplyr::filter()     masks stats::filter()
+## x dplyr::first()      masks S4Vectors::first()
+## x dplyr::lag()        masks stats::lag()
+## x ggplot2::Position() masks BiocGenerics::Position(), base::Position()
+## x purrr::reduce()     masks IRanges::reduce()
+## x dplyr::rename()     masks S4Vectors::rename()
+## x dplyr::slice()      masks XVector::slice(), IRanges::slice()</code></pre>
+</div>
+<div id="overview-with-illumina-reads" class="section level1">
+<h1>Overview with Illumina reads</h1>
+<p>For this first part we will be performing a number of steps on some paired-end illumina sequence data.</p>
+<div id="obtaining-data" class="section level2">
+<h2>Obtaining data</h2>
+<p>For these next steps we will follow analysis using the <a href="https://benjjneb.github.io/dada2/tutorial.html">dada2 pipeline</a>.</p>
+<p>Seeing as Illumina MiSeq is currently the most widely used platform we will first explore some pre-processing steps with data obtained from.</p>
+<p>For today’s example we will just select a subset of samples from this project to look into.</p>
+<p>If you are following along within the BIO513 google RStudio cloud the data is available for you in the directory <strong>data/</strong>.</p>
+<p><strong>Unzip files</strong> using the command <code>gunzip</code></p>
+<pre class="bash"><code>gunzip data/ngs/illumina/*.fastq.gz</code></pre>
+<p>Set path to where the fastq files are</p>
+<pre class="r"><code># Path to raw data
+path &lt;- &quot;data/ngs/illumina&quot;
+list.files(path)</code></pre>
+<pre><code>##  [1] &quot;filtered&quot;                                         
+##  [2] &quot;output&quot;                                           
+##  [3] &quot;SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq.gz&quot;
+##  [4] &quot;SRR7943538_16S_V4_of_human_feces_PBS49_2.fastq.gz&quot;
+##  [5] &quot;SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq.gz&quot;
+##  [6] &quot;SRR7943539_16S_V4_of_human_feces_PBS43_2.fastq.gz&quot;
+##  [7] &quot;SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq.gz&quot;
+##  [8] &quot;SRR7943543_16S_V4_of_human_feces_PBS39_2.fastq.gz&quot;
+##  [9] &quot;SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq.gz&quot;
+## [10] &quot;SRR7943544_16S_V4_of_human_feces_PBS63_2.fastq.gz&quot;</code></pre>
+<p>Set forward and reverse file naming conventions</p>
+<pre class="r"><code># In this example forward and reverse fastq are denoted by either *1.fastq or *2.fastq.
+fnFs &lt;- sort(list.files(path, pattern=&quot;_1.fastq&quot;, full.names = TRUE))
+fnRs &lt;- sort(list.files(path, pattern=&quot;_2.fastq&quot;, full.names = TRUE))
+# Extract sample names
+sample.names &lt;- sapply(strsplit(basename(fnFs), &quot;_&quot;), `[`, 7)
+# check files names are correct
+sample.names</code></pre>
+<pre><code>## [1] &quot;PBS49&quot; &quot;PBS43&quot; &quot;PBS39&quot; &quot;PBS63&quot;</code></pre>
+<p>Primers:</p>
+<ul>
+<li>28F-YM (forward primer): <strong>TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG</strong>GAGTTTGATYMTGGCTCAG</li>
+<li>28F-Borrellia (forward primer) : <strong>TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG</strong>GAGTTTGATCCTGGCTTAG</li>
+<li>28FChloroflex (forward primer): <strong>TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG</strong>GAATTTGATCTTGGTTCAG</li>
+<li>28F-Bifdo (forward primer): <strong>TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG</strong>GGGTTCGATTCTGGCTCAG</li>
+<li>388R (reverse primer): <strong>GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG</strong>TGCTGCCTCCCGTAGGAGT</li>
+</ul>
+</div>
+<div id="inspect-read-quality-profiles" class="section level2">
+<h2>Inspect read quality profiles</h2>
+<p>We start by visualizing the quality profiles of the forward reads:</p>
+<pre class="r"><code>plotQualityProfile(fnFs[1:4])</code></pre>
+<pre><code>## Warning: `guides(&lt;scale&gt; = FALSE)` is deprecated. Please use `guides(&lt;scale&gt; =
+## &quot;none&quot;)` instead.</code></pre>
+<p><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>plotQualityProfile(fnRs[1:4])</code></pre>
+<pre><code>## Warning: `guides(&lt;scale&gt; = FALSE)` is deprecated. Please use `guides(&lt;scale&gt; =
+## &quot;none&quot;)` instead.</code></pre>
+<p><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>In <strong>gray-scale</strong> is a heat map of the frequency of each quality score at each base position. The mean quality score at each position is shown by the <strong>green line</strong>, and the quartiles of the quality score distribution by the <strong>orange lines</strong>. The <strong>red line</strong> shows the scaled proportion of reads that extend to at least that position (this is more useful for other sequencing technologies, as Illumina reads are typically all the same length, hence the flat red line).</p>
+<p>The forward reads are good quality. We can see that for the reverse reads quality drops off much more significantly, especially at the end - which is common in Illumina sequencing. This isn’t too worrisome, as DADA2 incorporates quality information into its error model which makes the algorithm robust to lower quality sequence, but trimming as the average qualities crash will improve the algorithm’s sensitivity to rare sequence variants.</p>
+<blockquote>
+<p>Considerations for your own data: How much do your reads overlap? Some assays rely on complete overlap and therefore use read quality for filtering. But you need to consider how much your reads overlap for this step. Your <code>truncLen</code> must be large enough to maintain <code>20 + biological.length.variation</code> nucleotides of overlap between them.</p>
+</blockquote>
+</div>
+<div id="filter-and-trim" class="section level2">
+<h2>Filter and trim</h2>
+<p>Assign the filenames for the filtered fastq.gz files.</p>
+<p><strong>Place filtered files in filtered/ subdirectory</strong></p>
+<pre class="r"><code>filtFs &lt;- file.path(path, &quot;filtered&quot;, paste0(sample.names, &quot;_F_filt.fastq.gz&quot;))
+filtRs &lt;- file.path(path, &quot;filtered&quot;, paste0(sample.names, &quot;_R_filt.fastq.gz&quot;))
+names(filtFs) &lt;- sample.names
+names(filtRs) &lt;- sample.names</code></pre>
+<p>We’ll use standard filtering parameters: <code>maxN=0</code> (DADA2 requires no Ns), <code>truncQ=2</code>, <code>rm.phix=TRUE</code> and <code>maxEE=2</code>. The <code>maxEE</code> parameter sets the maximum number of “expected errors” allowed in a read, which is <a href="https://academic.oup.com/bioinformatics/article/31/21/3476/194979">a better filter than simply averaging quality scores</a>.</p>
+<pre class="r"><code>out &lt;- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300,160),
+              maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+              compress=TRUE, multithread=TRUE)
+head(out)</code></pre>
+<pre><code>##                                                   reads.in reads.out
+## SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq.gz    23638     15693
+## SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq.gz    26329     17832
+## SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq.gz    31301     19236
+## SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq.gz    39768     27496</code></pre>
+</div>
+<div id="learn-errors" class="section level2">
+<h2>Learn errors</h2>
+<p>The DADA2 algorithm makes use of a parametric error model (<code>err</code>) and every amplicon dataset has a different set of error rates. The <code>learnErrors</code> method learns this error model from the data, by alternating estimation of the error rates and inference of sample composition until they converge on a jointly consistent solution. As in many machine-learning problems, the algorithm must begin with an initial guess, for which the maximum possible error rates in this data are used (the error rates if only the most abundant sequence is correct and all the rest are errors).</p>
+<p><em>The following runs in about 2 minutes on a 2019 Macbook Pro on the dataset used in the tutorial</em></p>
+<pre class="r"><code>errF &lt;- learnErrors(filtFs, multithread=TRUE)</code></pre>
+<pre><code>## 24077100 total bases in 80257 reads from 4 samples will be used for learning the error rates.</code></pre>
+<pre class="r"><code>errR &lt;- learnErrors(filtRs, multithread=TRUE)</code></pre>
+<pre><code>## 12841120 total bases in 80257 reads from 4 samples will be used for learning the error rates.</code></pre>
+<p>It is always worthwhile, as a sanity check if nothing else, to visualize the estimated error rates:</p>
+<pre class="r"><code>plotErrors(errF, nominalQ=TRUE)</code></pre>
+<pre><code>## Warning: Transformation introduced infinite values in continuous y-axis
+## Transformation introduced infinite values in continuous y-axis</code></pre>
+<p><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>The error rates for each possible transition (A–&gt;C, A–&gt;G,…) are shown. Points are the observed error rates for each consensus quality score. The black line shows the estimated error rates after convergence of the machine-learning algorithm. The red line shows the error rates expected under the nominal definition of the Q-score. Here the estimated error rates (black line) are a good fit to the observed rates (points), and the error rates drop with increased quality as expected. Everything looks reasonable and we proceed with confidence.</p>
+</div>
+<div id="sample-inference" class="section level2">
+<h2>Sample Inference</h2>
+<p>We are now ready to apply the core sample inference algorithm to the filtered and trimmed sequence data.</p>
+<pre class="r"><code>dadaFs &lt;- dada(filtFs, err=errF, multithread=TRUE)</code></pre>
+<pre><code>## Sample 1 - 15693 reads in 6413 unique sequences.
+## Sample 2 - 17832 reads in 7633 unique sequences.
+## Sample 3 - 19236 reads in 8784 unique sequences.
+## Sample 4 - 27496 reads in 11160 unique sequences.</code></pre>
+<pre class="r"><code>dadaRs &lt;- dada(filtRs, err=errR, multithread=TRUE)</code></pre>
+<pre><code>## Sample 1 - 15693 reads in 2314 unique sequences.
+## Sample 2 - 17832 reads in 2562 unique sequences.
+## Sample 3 - 19236 reads in 3104 unique sequences.
+## Sample 4 - 27496 reads in 3752 unique sequences.</code></pre>
+<p>Inspecting the returned dada-class object:</p>
+<pre class="r"><code>dadaFs[[1]]</code></pre>
+<pre><code>## dada-class: object describing DADA2 denoising results
+## 240 sequence variants were inferred from 6413 input unique sequences.
+## Key parameters: OMEGA_A = 1e-40, OMEGA_C = 1e-40, BAND_SIZE = 16</code></pre>
+</div>
+<div id="merge-paired-reads" class="section level2">
+<h2>Merge paired reads</h2>
+<p>We now merge the forward and reverse reads together to obtain the full denoised sequences. Merging is performed by aligning the denoised forward reads with the reverse-complement of the corresponding denoised reverse reads, and then constructing the merged “contig” sequences. By default, merged sequences are only output if the forward and reverse reads overlap by at least 12 bases, and are identical to each other in the overlap region (but these conditions can be changed via function arguments).</p>
+<pre class="r"><code>mergers &lt;- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)</code></pre>
+<pre><code>## 14023 paired-reads (in 233 unique pairings) successfully merged out of 14803 (in 371 pairings) input.</code></pre>
+<pre><code>## 15738 paired-reads (in 229 unique pairings) successfully merged out of 16940 (in 401 pairings) input.</code></pre>
+<pre><code>## 17360 paired-reads (in 255 unique pairings) successfully merged out of 18301 (in 476 pairings) input.</code></pre>
+<pre><code>## 25158 paired-reads (in 358 unique pairings) successfully merged out of 26388 (in 671 pairings) input.</code></pre>
+<pre class="r"><code># Inspect the merger data.frame from the first sample
+head(mergers[[1]])</code></pre>
+<pre><code>##                                                                                                                                                                                                                                                                                                                                                              sequence
+## 1   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCGCATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 2 GAGTTTGATTATGGCTCAGGATGAACGCTAGCGACAGGCCTAACACATGCAAGTCGAGGGGCAGCGGGGAGGTAGCAATACCTTTGCCGGCGACCGGCGCACGGGTGAGTAACACGTATGCAATCCACCTGTAACAGGGGGATAACCCGGAGAAATCCGGACTAATACCCCATAATATGGGCGCTCCGCATGGAGAGTTCATTAAAGAGAGCAATTTTGGTTACAGACGAGCATGCGCTCCATTAGCCAGTTGGCGGGGTAACGGCCCACCAAGGCGACGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 3    GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCATCAGGAAGAAAGCTTGCTTTCTTTGCTGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCCTTTACTCGGGGATAGCCTTTCGAAAGAAAGATTAATACCCGATGGCATAATGATTCCGCATGGTTTCATTATTAAAGGATTCCGGTAAAGGATGGGGATGCGTTCCATTAGGTTGTTGGTGAGGTAACGGCTCACCAAGCCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 4   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCACATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 5   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTTCACATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 6  GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATTTTAGTTTGCTTGCAAACTGAAGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGATAACTCCGGAATAGCCTTTCGAAAGAAAGATTAATACCGGATAGTATACGAATATCGCATGATATTTTTATTAAAGAATTTCGGTTATCGATGGGGATGCGTTCCATTAGTTTGTTGGCGGGGTAACGGCCCACCAAGACTACGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+##   abundance forward reverse nmatch nmismatch nindel prefer accept
+## 1       755       1       1    107         0      0      2   TRUE
+## 2       344       2       3    105         0      0      2   TRUE
+## 3       305       3       4    108         0      0      2   TRUE
+## 4       293      36       1    107         0      0      2   TRUE
+## 5       279       4       1    107         0      0      2   TRUE
+## 6       259       6       2    106         0      0      2   TRUE</code></pre>
+<div class="content-box content-box-danger">
+<p>Considerations for your own data: Most of your reads should successfully merge. If that is not the case upstream parameters may need to be revisited: Did you trim away the overlap between your reads?</p>
+</div>
+</div>
+<div id="construct-sequence-table" class="section level2">
+<h2>Construct sequence table</h2>
+<p>We can now construct an amplicon sequence variant table (ASV) table, a higher-resolution version of the OTU table produced by traditional methods.</p>
+<pre class="r"><code>seqtab &lt;- makeSequenceTable(mergers)
+dim(seqtab)</code></pre>
+<pre><code>## [1]   4 930</code></pre>
+<pre class="r"><code># Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab))) </code></pre>
+<pre><code>## 
+## 325 335 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 
+##   1  20   3   7   6   1   2  28  18  18 109  49  19  32  66  58  98  96   2   1 
+## 359 360 361 362 363 364 365 366 367 368 370 371 372 376 377 378 379 380 398 448 
+##   6   3  30  63  48  58  19   2   3   5  39   1   5   1   1   2   1   4   4   1</code></pre>
+<div class="content-box content-box-danger">
+<p>Considerations for your own data: Sequences that are much longer or shorter than expected may be the result of non-specific priming. You can remove non-target-length sequences from your sequence table (eg. <code>seqtab2 &lt;- seqtab[,nchar(colnames(seqtab)) %in% 250:256</code>]). This is analogous to “cutting a band” in-silico to get amplicons of the targeted length</p>
+</div>
+</div>
+<div id="remove-chimeras" class="section level2">
+<h2>Remove chimeras</h2>
+<p>The core dada method corrects substitution and indel errors, but chimeras remain. Fortunately, the accuracy of sequence variants after denoising makes identifying chimeric ASVs simpler than when dealing with fuzzy OTUs. Chimeric sequences are identified if they can be exactly reconstructed by combining a left-segment and a right-segment from two more abundant “parent” sequences.</p>
+<pre class="r"><code>seqtab.nochim &lt;- removeBimeraDenovo(seqtab, method=&quot;consensus&quot;, 
+                                    multithread=TRUE, verbose=TRUE)</code></pre>
+<pre><code>## Identified 325 bimeras out of 930 input sequences.</code></pre>
+<p>Let’s check how many ASVs we end up with, we’ll also check what proportion of the original sequences we have retained.</p>
+<pre class="r"><code>dim(seqtab.nochim)</code></pre>
+<pre><code>## [1]   4 605</code></pre>
+<pre class="r"><code>sum(seqtab.nochim)/sum(seqtab)</code></pre>
+<pre><code>## [1] 0.7642884</code></pre>
+<p>We often want to do further inspect or perform some further analysis using the ASV count table so we will save it as a csv file.</p>
+<pre class="r"><code>asv_tab &lt;- as.data.frame(t(seqtab.nochim))
+N &lt;- nrow(asv_tab)
+x = 1:N
+asv_tab$ASVid &lt;- paste(&quot;ASV&quot;,x, sep = &quot;_&quot;)
+asv_tab &lt;- rownames_to_column(asv_tab, var = &quot;ASVseq&quot;)
+asv_tab &lt;- asv_tab[, c(6, 1, 2, 3, 4, 5)]
+# write csv file
+write.csv(asv_tab, &quot;data/ngs/illumina/output/asvtab.csv&quot;)</code></pre>
+<p>We also want to extract the ASV sequences and store in a <code>.fasta</code> format file.</p>
+<pre class="r"><code>seqs &lt;- asv_tab$ASVseq
+names(seqs) = asv_tab$ASVid
+dna = DNAStringSet(seqs)
+# write fasta file
+writeXStringSet(dna, &quot;data/ngs/illumina/output/asv.fasta&quot;)</code></pre>
+<p>The frequency of chimeric sequences varies substantially from dataset to dataset, and depends on on factors including experimental procedures and sample complexity. Here chimeras make up about 21% of the merged sequence variants, but when we account for the abundances of those variants we see they account for only about 4% of the merged sequence reads.</p>
+<div class="content-box content-box-danger">
+<p>Considerations for your own data: Most of your reads should remain after chimera removal (it is not uncommon for a majority of sequence variants to be removed though). If most of your reads were removed as chimeric, upstream processing may need to be revisited. In almost all cases this is caused by primer sequences with ambiguous nucleotides that were not removed prior to beginning the DADA2 pipeline.</p>
+</div>
+</div>
+<div id="track-reads-through-the-pipeline" class="section level2">
+<h2>Track reads through the pipeline</h2>
+<p>As a final check of our progress, we’ll look at the number of reads that made it through each step in the pipeline:</p>
+<pre class="r"><code>getN &lt;- function(x) sum(getUniques(x))
+track &lt;- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+# If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) &lt;- c(&quot;input&quot;, &quot;filtered&quot;, &quot;denoisedF&quot;, &quot;denoisedR&quot;, &quot;merged&quot;, &quot;nonchim&quot;)
+rownames(track) &lt;- sample.names
+track</code></pre>
+<pre><code>##       input filtered denoisedF denoisedR merged nonchim
+## PBS49 23638    15693     14864     15540  14023   10504
+## PBS43 26329    17832     17022     17707  15738   12178
+## PBS39 31301    19236     18444     18977  17360   13129
+## PBS63 39768    27496     26527     27274  25158   19431</code></pre>
+<pre class="r"><code># write the track sequence file to csv
+write.csv(track, &quot;data/ngs/illumina/output/track.csv&quot;)</code></pre>
+</div>
+<div id="assign-taxonomy" class="section level2">
+<h2>Assign taxonomy</h2>
+<p>*This is an “I have prepared earlier” bit for you as it requires a large dataset and takes a while to do computationally.</p>
+<p>Download the silva species assignment database from <a href="https://zenodo.org/record/4587955#.YhTZeJNBzek">zenodo repository</a> <code>silva_species_assignment_v138.1.fa.gz</code>.</p>
+<pre class="r"><code>taxa &lt;- assignTaxonomy(seqtab.nochim, &quot;/Users/Siobhon/db/silva_nr_v128_train_set.fa.gz&quot;, multithread=TRUE)
+
+taxa &lt;- addSpecies(taxa, &quot;/Users/Siobhon/db/silva_species_assignment_v138.1.fa.gz&quot;)
+
+# save rda
+save(taxa, file = &quot;data/ngs/illumina/output/taxa.RData&quot;)</code></pre>
+<p>Let’s inspect the taxonomic assignments:</p>
+<pre class="r"><code># Load in prepared taxa data
+
+# show taxa file
+load(&quot;data/ngs/illumina/output/taxa.RData&quot;)
+taxa.print &lt;- taxa # Removing sequence rownames for display only
+rownames(taxa.print) &lt;- NULL
+head(taxa.print)</code></pre>
+<pre><code>##      Kingdom    Phylum          Class         Order           Family          
+## [1,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+## [2,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Rikenellaceae&quot; 
+## [3,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+## [4,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Rikenellaceae&quot; 
+## [5,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+## [6,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+##      Genus         Species
+## [1,] &quot;Bacteroides&quot; NA     
+## [2,] &quot;Alistipes&quot;   NA     
+## [3,] &quot;Bacteroides&quot; NA     
+## [4,] &quot;Alistipes&quot;   NA     
+## [5,] &quot;Bacteroides&quot; NA     
+## [6,] &quot;Bacteroides&quot; NA</code></pre>
+<p>We now also format to save as csv file</p>
+<pre class="r"><code>tax_tab &lt;- as.data.frame(taxa.print)
+N &lt;- nrow(tax_tab)
+x = 1:N
+tax_tab$ASVid &lt;- paste(&quot;ASV&quot;,x, sep = &quot;_&quot;)
+tax_tab &lt;- tax_tab[, c(8, 1, 2, 3, 4, 5, 6, 7)]
+write.csv(tax_tab, &quot;data/ngs/illumina/output/taxa.csv&quot;)</code></pre>
+<hr />
+</div>
+</div>
+<div id="sequence-alignment-and-phylogeny" class="section level1">
+<h1>Sequence alignment and phylogeny</h1>
+<div id="some-quick-interactions-with-fasta-sequences" class="section level2">
+<h2>Some quick interactions with fasta sequences</h2>
+<p>Now we have practically dealt with <code>fastq</code> vs <code>fasta</code> sequence file formats let us explore the thinks we can do with a <code>fasta</code> file.</p>
+<p>Read in ASV sequence <code>fasta</code> file (if you have it loaded from moedule above you can skip this)</p>
+<pre class="r"><code>dna &lt;- readDNAStringSet(&quot;data/ngs/illumina/output/asv.fasta&quot;)</code></pre>
+<p>Check mean length of the ASVs</p>
+<pre class="r"><code>mean(width(dna))</code></pre>
+<pre><code>## [1] 355.3058</code></pre>
+<p>We may also want to check the frequency of each nucleotide as summary across all ASVs.</p>
+<pre class="r"><code>alphabetFrequency(dna, baseOnly=T, as.prob=T, collapse=T)</code></pre>
+<pre><code>##         A         C         G         T     other 
+## 0.2614998 0.2263537 0.3148121 0.1973344 0.0000000</code></pre>
+<p>We often do a GC content check</p>
+<pre class="r"><code>GC_content &lt;- letterFrequency(dna, letters=&quot;CG&quot;)
+head(GC_content)</code></pre>
+<pre><code>##      C|G
+## [1,] 184
+## [2,] 186
+## [3,] 181
+## [4,] 176
+## [5,] 182
+## [6,] 183</code></pre>
+<p>Other handy tools are useful for reversing sequencing, producing complement sequence and reverse complement.</p>
+<pre class="r"><code>dnarev &lt;- reverse(dna)
+dnarevcom &lt;- reverseComplement(dna)
+dnacom &lt;- reverseComplement(dna)</code></pre>
+<div class="content-box content-box-info">
+<p>The GC pair is bound by three hydrogen bonds, while AT pairs are bound by two hydrogen bonds. And so, The GC content affects the stability of DNA. The GC content affects the secondary structure of mRNA. The GC content affects the annealing temperature for template DNA in PCR experiments.</p>
+</div>
+<pre class="r"><code>dna</code></pre>
+<pre><code>## DNAStringSet object of length 605:
+##       width seq                                             names               
+##   [1]   353 GAGTTTGATTATGGCTCAGGAT...CAAACTCCTACGGGAGGCAGCA ASV_1
+##   [2]   352 GAGTTTGATTATGGCTCAGGAT...CAAACTCCTACGGGAGGCAGCA ASV_2
+##   [3]   352 GAGTTTGATTATGGCTCAGGAT...CAAACTCCTACGGGAGGCAGCA ASV_3
+##   [4]   351 GAGTTTGATTATGGCTCAGGAT...CAGACTCCTACGGGAGGCAGCA ASV_4
+##   [5]   353 GAGTTTGATTATGGCTCAGGAT...CAAACTCCTACGGGAGGCAGCA ASV_5
+##   ...   ... ...
+## [601]   345 GAGTTTGATTATGGCTCAGGAT...CAGACTCCTACGGGAGGCAGCA ASV_601
+## [602]   349 GAGTTTGATTATGGCTCAGGAC...CAGACTCCTACGGGAGGCAGCA ASV_602
+## [603]   379 GAGTTTGATTATGGCTCAGGAC...CAGACTCCTACGGGAGGCAGCA ASV_603
+## [604]   347 GAATTTGATTATGGCTCAGATT...CAGACTCCTACGGGAGGCAGCA ASV_604
+## [605]   366 GAGTTTGATCCTGGCTCAGGAT...CAGACTCCTACGGGAGGCAGCA ASV_605</code></pre>
+</div>
+<div id="alignment" class="section level2">
+<h2>Alignment</h2>
+<p>Now that we have loaded the <code>fasta</code> sequences in R we will run through sequence alignment and producing a phylogenetic tree. Although today we will do this in R, often this require high computational power and uses unix shell command line tools.</p>
+<p>First we will subset our ASV data set to just include the first 25 sequences</p>
+<pre class="r"><code>top25 &lt;- dna[1:25]</code></pre>
+<p>Then we run the <code>msa()</code> function to align the sequences, we will use the default ClustalW with default parameters:</p>
+<p><em>This takes approx 2 mins to run on a MacBook Pro 2019</em></p>
+<pre class="r"><code>top25_aln &lt;- msa(top25)</code></pre>
+<pre><code>## use default substitution matrix</code></pre>
+<p>Show the to 23</p>
+<pre class="r"><code>print(top25_aln)</code></pre>
+<pre><code>## CLUSTAL 2.1  
+## 
+## Call:
+##    msa(top25)
+## 
+## MsaDNAMultipleAlignment with 25 rows and 370 columns
+##      aln                                                   names
+##  [1] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_17
+##  [2] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_23
+##  [3] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_19
+##  [4] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_21
+##  [5] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_22
+##  [6] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_24
+##  [7] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_8
+##  [8] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_16
+##  [9] GAGTTTGATTATGGCTCAGATTGAA...GTCCAGACTCCTACGGGAGGCAGCA ASV_25 
+##  ... ...
+## [18] GAGTTTGATTATGGCTCAGGATGAA...GTCCAAACTCCTACGGGAGGCAGCA ASV_12
+## [19] GAGTTTGATTATGGCTCAGGATGAA...GTCCAAACTCCTACGGGAGGCAGCA ASV_9
+## [20] GAGTTTGATTATGGCTCAGGATGAA...GTCCAAACTCCTACGGGAGGCAGCA ASV_3
+## [21] GAGTTTGATTATGGCTCAGGATGAA...GTCCAAACTCCTACGGGAGGCAGCA ASV_14
+## [22] GAGTTTGATTATGGCTCAGGATGAA...GACCAAACTCCTACGGGAGGCAGCA ASV_7
+## [23] GAGTTTGATTATGGCTCAGGATGAA...GACCAGACTCCTACGGGAGGCAGCA ASV_4
+## [24] GAGTTTGATTATGGCTCAGGATGAA...GACCAGACTCCTACGGGAGGCAGCA ASV_20
+## [25] GAGTTTGATTATGGCTCAGGATGAA...GACCAAACTCCTACGGGAGGCAGCA ASV_2
+##  Con GAGTTTGATTATGGCTCAGGATGAA...GTCCAGACTCCTACGGGAGGCAGCA Consensus</code></pre>
+<p>This converts a multiple sequence alignment object to formats used in other sequence analysis packages.</p>
+<pre class="r"><code>top25_con &lt;- msaConvert(top25_aln, type=&quot;seqinr::alignment&quot;)</code></pre>
+</div>
+<div id="distance-measures-and-tree" class="section level2">
+<h2>Distance measures and tree</h2>
+<p>We can use the <a href="http://ape-package.ird.fr/">ape</a> R package to build a quick phylogent.</p>
+<p>First we need to compute a matrix of pairwise distances from aligned sequences using an identity matrix. The resulting matrix contains the squared root of the pairwise distances.</p>
+<pre class="r"><code>dist &lt;- dist.alignment(top25_con, &quot;identity&quot;)</code></pre>
+<p>This function performs the neighbor-joining tree estimation of Saitou and Nei (1987).</p>
+<pre class="r"><code>njTree &lt;- nj(dist)
+plot(njTree, main=&quot;Phylogenetic Tree (NJ) of Amplicon Sequence Variants using ClustalW alignment&quot;)</code></pre>
+<p><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+</div>
+<div id="bonus-exercise" class="section level2">
+<h2>Bonus exercise!</h2>
+<p>Let’s see how this compares when we use the alternative sequence alignment methods</p>
+<pre class="r"><code># Muscle alignment
+top25_maln &lt;- msa(top25, method=&quot;Muscle&quot;)
+# Clustal Omega alignment
+top25_coaln &lt;- msa(top25, method=&quot;ClustalOmega&quot;)</code></pre>
+<pre><code>## using Gonnet</code></pre>
+<pre class="r"><code>top25_mcon &lt;- msaConvert(top25_maln, type=&quot;seqinr::alignment&quot;)
+top25_cocon &lt;- msaConvert(top25_coaln, type=&quot;seqinr::alignment&quot;)</code></pre>
+<pre class="r"><code>dist2 &lt;- dist.alignment(top25_mcon, &quot;identity&quot;)
+dist3 &lt;- dist.alignment(top25_cocon, &quot;identity&quot;)</code></pre>
+<p>Now we reconstruct tree to compare plots</p>
+<pre class="r"><code>njTree2 &lt;- nj(dist2)
+plot(njTree2, main=&quot;Phylogenetic Tree (NJ) of ASVs using Muscle alignment&quot;)</code></pre>
+<p><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<pre class="r"><code>njTree3 &lt;- nj(dist3)
+plot(njTree3, main=&quot;Phylogenetic Tree (NJ) of ASVs using Clustal Omega alignment&quot;)</code></pre>
+<p><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+</div>
+</div>
+
+<hr> 
+<div class="logos"><img src="assets/squaremu.png" width="50px" align="right"></div>
+
+<br></br>
+
+<p style="text-align: center;"><span style="color: #4F5556;"><em>Copyright, Siobhon Egan, 2022.</em></span></p>
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Add font awesome icons -->
+<p style="text-align: center;">
+    <a href="https://github.com/siobhon-egan/BIO510-microbiome" class="fa fa-github"></a>
+</p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

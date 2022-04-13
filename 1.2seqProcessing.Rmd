@@ -1,0 +1,476 @@
+---
+title: "Sequence processing in R"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, include = TRUE)
+```
+
+**Links**
+
+- [Welcome to a Little Book of R for Bioinformatics!](https://a-little-book-of-r-for-bioinformatics.readthedocs.io/)
+- [Computational Genomics with R](https://compgenomr.github.io/book/)
+- [sthda genomics wiki](http://www.sthda.com/english/wiki/genomics)
+- [bioconductor - R and Bioconductor for Genomic Analysis](http://bioconductor.org/help/course-materials/2019/BiocAsia/02-Workshop.html)
+-[bioconductor - Introduction to R and Bioconductor](http://bioconductor.org/help/course-materials/2019/CSAMA/lab-1-intro-to-r-bioc.html)
+- [Biomedical Data Science](http://genomicsclass.github.io/book/)
+
+
+## Libraries
+
+*Install packages* - do this as we are talking, it might take a while
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("dada2")
+
+if (!requireNamespace("BiocManager", quietly=TRUE))
+install.packages("BiocManager")
+BiocManager::install("msa")
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("Biostrings")
+
+install.packages("ape")
+install.packages("seqinr")
+```
+
+Load libraries
+```{r, libraries, warning=FALSE, results='hide'}
+## load dada2 package
+library(dada2); packageVersion("dada2")
+
+## load seqinr package
+library(seqinr)
+
+## load msa package
+library(msa)
+
+## load Biostrings package
+library(Biostrings)
+
+# load ape package
+library(ape)
+
+library(tidyverse)
+```
+
+
+# Overview with Illumina reads
+
+For this first part we will be performing a number of steps on some paired-end illumina sequence data.
+
+## Obtaining data
+
+For these next steps we will follow analysis using the [dada2
+pipeline](https://benjjneb.github.io/dada2/tutorial.html).
+
+Seeing as Illumina MiSeq is currently the most widely used platform we will
+first explore some pre-processing steps with data obtained from.
+
+For today's example we will just select a subset of samples from this
+project to look into. 
+
+If you are following along within the BIO513 google RStudio cloud the data is available for you in the directory **data/**.
+
+
+**Unzip files** using the command `gunzip`
+
+``` {bash, eval = FALSE, include = TRUE}
+gunzip data/ngs/illumina/*.fastq.gz
+```
+
+Set path to where the fastq files are
+
+```{r illuminaraw, warning=FALSE, message=FALSE}
+# Path to raw data
+path <- "data/ngs/illumina"
+list.files(path)
+```
+
+Set forward and reverse file naming conventions
+
+```{r}
+# In this example forward and reverse fastq are denoted by either *1.fastq or *2.fastq.
+fnFs <- sort(list.files(path, pattern="_1.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_2.fastq", full.names = TRUE))
+# Extract sample names
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 7)
+# check files names are correct
+sample.names
+```
+
+Primers: 
+
+- 28F-YM (forward primer): **TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG**GAGTTTGATYMTGGCTCAG 
+- 28F-Borrellia (forward primer) : **TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG**GAGTTTGATCCTGGCTTAG
+- 28FChloroflex (forward primer): **TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG**GAATTTGATCTTGGTTCAG 
+- 28F-Bifdo (forward primer): **TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG**GGGTTCGATTCTGGCTCAG 
+- 388R (reverse primer): **GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG**TGCTGCCTCCCGTAGGAGT
+
+## Inspect read quality profiles
+
+We start by visualizing the quality profiles of the forward reads:
+
+```{r}
+plotQualityProfile(fnFs[1:4])
+```
+
+```{r}
+plotQualityProfile(fnRs[1:4])
+```
+
+In **gray-scale** is a heat map of the frequency of each quality score at each base position. 
+The mean quality score at each position is shown by the **green line**, and the quartiles of the quality score distribution by the **orange lines**. 
+The **red line** shows the scaled proportion of reads that extend to at least that position (this is more useful for other sequencing technologies, as Illumina reads are typically all the same length, hence the flat red line).
+
+The forward reads are good quality. We can see that for the reverse reads quality drops off much more significantly, especially at the end - which is common in Illumina sequencing. 
+This isn't too worrisome, as DADA2 incorporates quality information into its error model which makes the algorithm robust to lower quality sequence, but trimming as the average qualities crash will improve the algorithm's sensitivity to rare sequence variants. 
+
+> Considerations for your own data: How much do your reads overlap? Some
+> assays rely on complete overlap and therefore use read quality for
+> filtering. But you need to consider how much your reads overlap for
+> this step. Your `truncLen` must be large enough to maintain
+> `20 + biological.length.variation` nucleotides of overlap between
+> them.
+
+## Filter and trim
+
+Assign the filenames for the filtered fastq.gz files.
+
+**Place filtered files in filtered/ subdirectory**
+
+```{r}
+filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+```
+
+We'll use standard filtering parameters: `maxN=0` (DADA2 requires no
+Ns), `truncQ=2`, `rm.phix=TRUE` and `maxEE=2`. The `maxEE` parameter
+sets the maximum number of "expected errors" allowed in a read, which is
+[a better filter than simply averaging quality scores](https://academic.oup.com/bioinformatics/article/31/21/3476/194979).
+
+```{r}
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300,160),
+              maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+              compress=TRUE, multithread=TRUE)
+head(out)
+```
+
+## Learn errors
+
+The DADA2 algorithm makes use of a parametric error model (`err`) and every amplicon dataset has a different set of error rates. 
+The `learnErrors` method learns this error model from the data, by alternating estimation of the error rates and inference of sample composition until they converge on a jointly consistent solution. 
+As in many machine-learning problems, the algorithm must begin with an initial guess, for which the maximum possible error rates in this data are used (the error rates if only the most abundant sequence is correct and all the rest are errors).
+
+*The following runs in about 2 minutes on a 2019 Macbook Pro on the dataset used in the tutorial*
+```{r}
+errF <- learnErrors(filtFs, multithread=TRUE)
+errR <- learnErrors(filtRs, multithread=TRUE)
+```
+
+It is always worthwhile, as a sanity check if nothing else, to visualize
+the estimated error rates:
+
+```{r}
+plotErrors(errF, nominalQ=TRUE)
+```
+
+The error rates for each possible transition (A--\>C, A--\>G,...) are
+shown. Points are the observed error rates for each consensus quality
+score. The black line shows the estimated error rates after convergence
+of the machine-learning algorithm. The red line shows the error rates
+expected under the nominal definition of the Q-score. Here the estimated
+error rates (black line) are a good fit to the observed rates (points),
+and the error rates drop with increased quality as expected. Everything
+looks reasonable and we proceed with confidence.
+
+## Sample Inference
+
+We are now ready to apply the core sample inference algorithm to the
+filtered and trimmed sequence data.
+
+```{r}
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+```
+
+Inspecting the returned dada-class object:
+
+```{r}
+dadaFs[[1]]
+```
+
+## Merge paired reads
+
+We now merge the forward and reverse reads together to obtain the full
+denoised sequences. Merging is performed by aligning the denoised
+forward reads with the reverse-complement of the corresponding denoised
+reverse reads, and then constructing the merged "contig" sequences. By
+default, merged sequences are only output if the forward and reverse
+reads overlap by at least 12 bases, and are identical to each other in
+the overlap region (but these conditions can be changed via function
+arguments).
+
+```{r}
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+# Inspect the merger data.frame from the first sample
+head(mergers[[1]])
+```
+
+:::: {.content-box .content-box-danger}
+Considerations for your own data: Most of your reads should successfully merge. If that is not the case upstream parameters may need to be revisited: Did you trim away the overlap between your reads?
+::::
+
+## Construct sequence table
+
+We can now construct an amplicon sequence variant table (ASV) table, a
+higher-resolution version of the OTU table produced by traditional
+methods.
+
+```{r}
+seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+```
+
+```{r}
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab))) 
+```
+
+:::: {.content-box .content-box-danger}
+Considerations for your own data: Sequences that are much longer or shorter than expected may be the result of non-specific priming. You can remove non-target-length sequences from your sequence table (eg. `seqtab2 <- seqtab[,nchar(colnames(seqtab)) %in% 250:256`]). This is analogous to “cutting a band” in-silico to get amplicons of the targeted length
+::::
+
+## Remove chimeras
+
+The core dada method corrects substitution and indel errors, but
+chimeras remain. Fortunately, the accuracy of sequence variants after
+denoising makes identifying chimeric ASVs simpler than when dealing with
+fuzzy OTUs. Chimeric sequences are identified if they can be exactly
+reconstructed by combining a left-segment and a right-segment from two
+more abundant "parent" sequences.
+
+```{r}
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", 
+                                    multithread=TRUE, verbose=TRUE)
+```
+
+Let's check how many ASVs we end up with, we'll also check what proportion of the original sequences we have retained.
+
+```{r}
+dim(seqtab.nochim)
+sum(seqtab.nochim)/sum(seqtab)
+```
+
+We often want to do further inspect or perform some further analysis using the ASV count table so we will save it as a csv file.
+```{r}
+asv_tab <- as.data.frame(t(seqtab.nochim))
+N <- nrow(asv_tab)
+x = 1:N
+asv_tab$ASVid <- paste("ASV",x, sep = "_")
+asv_tab <- rownames_to_column(asv_tab, var = "ASVseq")
+asv_tab <- asv_tab[, c(6, 1, 2, 3, 4, 5)]
+# write csv file
+write.csv(asv_tab, "data/ngs/illumina/output/asvtab.csv")
+```
+
+We also want to extract the ASV sequences and store in a `.fasta` format file.
+```{r}
+seqs <- asv_tab$ASVseq
+names(seqs) = asv_tab$ASVid
+dna = DNAStringSet(seqs)
+# write fasta file
+writeXStringSet(dna, "data/ngs/illumina/output/asv.fasta")
+```
+
+The frequency of chimeric sequences varies substantially from dataset to dataset, and depends on on factors including experimental procedures and sample complexity. Here chimeras make up about 21% of the merged sequence variants, but when we account for the abundances of those variants we see they account for only about 4% of the merged sequence reads.
+
+:::: {.content-box .content-box-danger}
+Considerations for your own data: Most of your reads should remain after chimera removal (it is not uncommon for a majority of sequence variants to be removed though). If most of your reads were removed as chimeric, upstream processing may need to be revisited. In almost all cases this is caused by primer sequences with ambiguous nucleotides that were not removed prior to beginning the DADA2 pipeline.
+::::
+
+## Track reads through the pipeline
+
+As a final check of our progress, we'll look at the number of reads that
+made it through each step in the pipeline:
+
+```{r}
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+# If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.names
+track
+# write the track sequence file to csv
+write.csv(track, "data/ngs/illumina/output/track.csv")
+```
+
+## Assign taxonomy
+
+*This is an "I have prepared earlier" bit for you as it requires a large dataset and takes a while to do computationally.
+
+Download the silva species assignment database from [zenodo repository](https://zenodo.org/record/4587955#.YhTZeJNBzek)
+`silva_species_assignment_v138.1.fa.gz`.
+
+```{r, eval=FALSE}
+taxa <- assignTaxonomy(seqtab.nochim, "/Users/Siobhon/db/silva_nr_v128_train_set.fa.gz", multithread=TRUE)
+
+taxa <- addSpecies(taxa, "/Users/Siobhon/db/silva_species_assignment_v138.1.fa.gz")
+
+# save rda
+save(taxa, file = "data/ngs/illumina/output/taxa.RData")
+```
+
+Let's inspect the taxonomic assignments:
+
+```{r}
+# Load in prepared taxa data
+
+# show taxa file
+load("data/ngs/illumina/output/taxa.RData")
+taxa.print <- taxa # Removing sequence rownames for display only
+rownames(taxa.print) <- NULL
+head(taxa.print)
+```
+
+We now also format to save as csv file
+```{r}
+tax_tab <- as.data.frame(taxa.print)
+N <- nrow(tax_tab)
+x = 1:N
+tax_tab$ASVid <- paste("ASV",x, sep = "_")
+tax_tab <- tax_tab[, c(8, 1, 2, 3, 4, 5, 6, 7)]
+write.csv(tax_tab, "data/ngs/illumina/output/taxa.csv")
+```
+
+---
+
+# Sequence alignment and phylogeny
+
+## Some quick interactions with fasta sequences
+
+Now we have practically dealt with `fastq` vs `fasta` sequence file formats let us explore the thinks we can do with a `fasta` file.
+
+Read in ASV sequence `fasta` file (if you have it loaded from moedule above you can skip this)
+```{r}
+dna <- readDNAStringSet("data/ngs/illumina/output/asv.fasta")
+```
+
+Check mean length of the ASVs
+```{r}
+mean(width(dna))
+```
+
+We may also want to check the frequency of each nucleotide as summary across all ASVs.
+```{r}
+alphabetFrequency(dna, baseOnly=T, as.prob=T, collapse=T)
+```
+We often do a GC content check
+```{r}
+GC_content <- letterFrequency(dna, letters="CG")
+head(GC_content)
+```
+
+Other handy tools are useful for reversing sequencing, producing complement sequence and reverse complement.
+```{r}
+dnarev <- reverse(dna)
+dnarevcom <- reverseComplement(dna)
+dnacom <- reverseComplement(dna)
+```
+
+:::: {.content-box .content-box-info}
+The GC pair is bound by three hydrogen bonds, while AT pairs are bound by two hydrogen bonds. And so,
+The GC content affects the stability of DNA.
+The GC content affects the secondary structure of mRNA.
+The GC content affects the annealing temperature for template DNA in PCR experiments.
+::::
+
+```{r}
+dna
+```
+
+## Alignment
+
+Now that we have loaded the `fasta` sequences in R we will run through sequence alignment and producing a phylogenetic tree.
+Although today we will do this in R, often this require high computational power and uses unix shell command line tools.
+
+First we will subset our ASV data set to just include the first 25 sequences
+```{r}
+top25 <- dna[1:25]
+```
+
+Then we run the `msa()` function to align the sequences, we will use the default ClustalW with default parameters:
+
+*This takes approx 2 mins to run on a MacBook Pro 2019*
+```{r}
+top25_aln <- msa(top25)
+```
+
+Show the to 23
+```{r}
+print(top25_aln)
+```
+
+This converts a multiple sequence alignment object to formats used in other sequence analysis packages.
+```{r}
+top25_con <- msaConvert(top25_aln, type="seqinr::alignment")
+```
+
+## Distance measures and tree
+
+We can use the [ape](http://ape-package.ird.fr/) R package to build a quick phylogent.
+
+First we need to compute a matrix of pairwise distances from aligned sequences using an identity matrix. The resulting matrix contains the squared root of the pairwise distances. 
+```{r}
+dist <- dist.alignment(top25_con, "identity")
+```
+
+This function performs the neighbor-joining tree estimation of Saitou and Nei (1987).
+```{r}
+njTree <- nj(dist)
+plot(njTree, main="Phylogenetic Tree (NJ) of ASVs using ClustalW alignment")
+```
+
+
+## Bonus exercise!
+
+Let's see how this compares when we use the alternative sequence alignment methods.
+
+>Navigate your way through the different options for phylogenetic analysis
+
+```{r}
+# Muscle alignment
+top25_maln <- msa(top25, method="Muscle")
+# Clustal Omega alignment
+top25_coaln <- msa(top25, method="ClustalOmega")
+```
+
+```{r}
+top25_mcon <- msaConvert(top25_maln, type="seqinr::alignment")
+top25_cocon <- msaConvert(top25_coaln, type="seqinr::alignment")
+```
+
+```{r}
+dist2 <- dist.alignment(top25_mcon, "identity")
+dist3 <- dist.alignment(top25_cocon, "identity")
+```
+
+Now we reconstruct tree to compare plots
+```{r}
+njTree2 <- nj(dist2)
+plot(njTree2, main="Phylogenetic Tree (NJ) of ASVs using Muscle alignment")
+```
+
+```{r}
+njTree3 <- nj(dist3)
+plot(njTree3, main="Phylogenetic Tree (NJ) of ASVs using Clustal Omega alignment")
+```
+

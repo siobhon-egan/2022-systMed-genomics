@@ -29,5 +29,8 @@ Content for Systems Medicine genomics lectures/workshops.
 
 | Content        | Link           |
 | ------------------- |:--------------------:|
+| Set up     | [link](1.setup.html)  |
+| Sequence data      | [link](1.1seqData.html)      |
+| Sequence processing      | [link](1.2seqProcessing.html)      |
 
 

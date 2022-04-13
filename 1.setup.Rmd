@@ -1,0 +1,47 @@
+---
+title: "BIO513 Set up"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Sequence data
+
+If you are following along within the BIO513 google RStudio cloud the data is available for you in the directory **data/**.
+
+Otherwise you can download the data from the repositories below
+
+### Illumina data
+
+You can retrieve the data from  <https://sra-explorer.info> and search for project accession `PRJNA493625`. Make sure you follow the same data directory location (i.e. **data/ngs/illumina** to ensure code below runs smoothly).
+
+``` {bash, eval = FALSE, include = TRUE}
+#!/usr/bin/env bash
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943543/SRR7943543_1.fastq.gz -o SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943543/SRR7943543_2.fastq.gz -o SRR7943543_16S_V4_of_human_feces_PBS39_2.fastq.gz
+
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943544/SRR7943544_1.fastq.gz -o SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/004/SRR7943544/SRR7943544_2.fastq.gz -o SRR7943544_16S_V4_of_human_feces_PBS63_2.fastq.gz
+
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943538/SRR7943538_1.fastq.gz -o SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943538/SRR7943538_2.fastq.gz -o SRR7943538_16S_V4_of_human_feces_PBS49_2.fastq.gz
+
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_1.fastq.gz -o SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_2.fastq.gz -o SRR7943539_16S_V4_of_human_feces_PBS43_2.fastq.gz
+```
+
+### PacBio data
+
+You can retrieve the data from  <https://sra-explorer.info> and search for project accession `PRJNA521754`. Make sure you follow the same data directory location (i.e. **data/ngs/pacbio** to ensure code below runs smoothly).
+
+``` {bash, eval = FALSE, include = TRUE}
+#!/usr/bin/env bash
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/009/SRR8557479/SRR8557479_subreads.fastq.gz -o SRR8557479_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/000/SRR8557480/SRR8557480_subreads.fastq.gz -o SRR8557480_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/008/SRR8557478/SRR8557478_subreads.fastq.gz -o SRR8557478_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/007/SRR8557477/SRR8557477_subreads.fastq.gz -o SRR8557477_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz
+```

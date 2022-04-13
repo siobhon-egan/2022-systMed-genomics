@@ -9,8 +9,13 @@ navbar:
     - text: "BIO 513"
       icon: fas fa-book-open
       menu:
-       - text: "Sequence processing"
-         href: 01seqProcessing.html   
+       - text: "Set up"
+         href: 1.setup.html
+       - text: "-----------"
+       - text: "Sequence data"
+         href: 1.1seqData.html  
+       - text: "Sequence Processing"
+         href: 1.2seqProcessing.html  
     - text: "BIO 514"
       icon: fas fa-book-open
       menu:
