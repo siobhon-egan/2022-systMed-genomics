@@ -39,7 +39,7 @@ Essentially we need at least three bits of data that talk to each other:
 Load data in RData - downloaded from https://github.com/ka-west/PBS_manuscript
 
 ```{r}
-load("data/BIO514/PBS_data.Rdata")
+load("data/BIO514-microbiome/PBS_data.Rdata")
 # Quick glance at phyloseq object
 ps_M
 ```

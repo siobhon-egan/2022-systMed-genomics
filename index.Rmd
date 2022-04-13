@@ -10,6 +10,8 @@ Content for Systems Medicine genomics lectures/workshops.
 
 ## BIO 514 Workshop - Microbiome bioinformatic analysis
 
+>Wednesday 13th April 2022
+
 | Content        | Link           |
 | ------------------- |:--------------------:|
 | *SLIDES*     | [link](BIO514-microbiome-slides/skeleton.html)  |
@@ -22,6 +24,8 @@ Content for Systems Medicine genomics lectures/workshops.
 ---
 
 ## BIO 513 Lecture and Workshop - Genomics data
+
+>Thursday 14th April 2022
 
 | Content        | Link           |
 | ------------------- |:--------------------:|

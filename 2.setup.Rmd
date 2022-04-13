@@ -22,6 +22,9 @@ Rename so `fastq.gz` files in format `SAMPLEID_L001_R1_001.fastq.gz` (forward) o
 
 You will not be required to download this for today's tutorial but if you wanted you could use this data and follow the [sequence processing](2.1seqProcessing.html) page.
 
+
+*Here is a quick way to download all associated data from PRJNA493625*
+
 ```bash
 #!/usr/bin/env bash
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943540/SRR7943540_1.fastq.gz -o SRR7943540_16S_V4_of_human_feces_PBS61_1.fastq.gz
@@ -149,15 +152,20 @@ You can view the downloaded `qzv` files using [QIIME2 view](https://view.qiime2.
 
 3.  **RData** (*REQUIRED*)
 
-The easiest way to follow along with this tutorial is to download this GitHub repository using either option **1** or **2** below:
+If you are following along on your own computer the easiest way is to download this GitHub repository using either option **A** or **B** below:
 
-1.  Go to <https://github.com/siobhon-egan/2022-systMed-genomics> and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
+A.  Go to <https://github.com/siobhon-egan/2022-systMed-genomics> and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
 
-2.  Use terminal and clone the GitHub repo.
+B.  Use terminal and clone the GitHub repo.
 
 ```
 git clone https://github.com/siobhon-egan/2022-systMed-genomics.git
 ```
+
+>Alternatively if you are using the RStudio cloud server as part of the BIO513 unit I have include the data we will need for today's lesson in the directory **data/BIO514-microbiome** directory.
+
+You can then just create your own Rmarkdown file and save in the *home/* directory. You can copy the code chunks in the script on the webpage [dataViz](http://siobhonlegan.com/2022-systMed-genomics/2.3dataViz.html) or find a copy of the `.Rmd` file [here](https://raw.githubusercontent.com/siobhon-egan/2022-systMed-genomics/master/2.3dataViz.Rmd).
+
 
 ## Install R packages
 

@@ -168,7 +168,7 @@ In this example each row is a sample and a column is the OTU/ASV.
 
 ```{r}
 # read data
-otu_table <- read_csv("data/BIO514/otu_table.csv")
+otu_table <- read_csv("data/BIO514-microbiome/otu_table.csv")
 paged_table(otu_table)
 ```
 
@@ -179,7 +179,7 @@ This contains the taxonomy of the count (or OTU) data. Each row is a unique OTU/
 
 ```{r}
 # read data
-tax_table <- read_csv("data/BIO514/tax_table.csv")
+tax_table <- read_csv("data/BIO514-microbiome/tax_table.csv")
 # To make it easier viewing remove sequence name in first column
 drop <- c("X1")
 df = tax_table[,!(names(tax_table) %in% drop)]
@@ -194,6 +194,6 @@ Lets take a quick look at the for the example data set we are about to use.
 
 ```{r}
 # read data
-sam_data <- read_csv("data/BIO514/sam_data.csv")
+sam_data <- read_csv("data/BIO514-microbiome/sam_data.csv")
 paged_table(sam_data)
 ```

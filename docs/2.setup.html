@@ -415,6 +415,7 @@ div.tocify {
 <p>Raw amplicon 16S sequence data from West et al. (2020) <em>Gut</em> 69, 1452-1459. doi: <a href="http://dx.doi.org/10.1136/gutjnl-2019-319620">10.1136/gutjnl-2019-319620</a>. Download raw data from NCBI Sequence Read Archive. Project number <code>PRJNA493625</code> from <a href="https://sra-explorer.info/" class="uri">https://sra-explorer.info/</a>.</p>
 <p>Rename so <code>fastq.gz</code> files in format <code>SAMPLEID_L001_R1_001.fastq.gz</code> (forward) or <code>SAMPLEID_L001_R2_001.fastq.gz</code> (reverse).</p>
 <p>You will not be required to download this for today’s tutorial but if you wanted you could use this data and follow the <a href="2.1seqProcessing.html">sequence processing</a> page.</p>
+<p><em>Here is a quick way to download all associated data from PRJNA493625</em></p>
 <pre class="bash"><code>#!/usr/bin/env bash
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943540/SRR7943540_1.fastq.gz -o SRR7943540_16S_V4_of_human_feces_PBS61_1.fastq.gz
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/000/SRR7943540/SRR7943540_2.fastq.gz -o SRR7943540_16S_V4_of_human_feces_PBS61_2.fastq.gz
@@ -535,12 +536,16 @@ curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/001/SRR7943491/SRR7943491_2.fa
 <ol start="3" style="list-style-type: decimal">
 <li><strong>RData</strong> (<em>REQUIRED</em>)</li>
 </ol>
-<p>The easiest way to follow along with this tutorial is to download this GitHub repository using either option <strong>1</strong> or <strong>2</strong> below:</p>
-<ol style="list-style-type: decimal">
+<p>If you are following along on your own computer the easiest way is to download this GitHub repository using either option <strong>A</strong> or <strong>B</strong> below:</p>
+<ol style="list-style-type: upper-alpha">
 <li><p>Go to <a href="https://github.com/siobhon-egan/2022-systMed-genomics" class="uri">https://github.com/siobhon-egan/2022-systMed-genomics</a> and click on the green <strong>Code</strong> button. Select <strong>Download ZIP</strong>, open/unzip the file. Open the <code>.Rmd</code> files in RStudio you will be able to follow along for the data analysis.</p></li>
 <li><p>Use terminal and clone the GitHub repo.</p></li>
 </ol>
 <pre><code>git clone https://github.com/siobhon-egan/2022-systMed-genomics.git</code></pre>
+<blockquote>
+<p>Alternatively if you are using the RStudio cloud server as part of the BIO513 unit I have include the data we will need for today’s lesson in the directory <strong>data/BIO514-microbiome</strong> directory.</p>
+</blockquote>
+<p>You can then just create your own Rmarkdown file and save in the <em>home/</em> directory. You can copy the code chunks in the script on the webpage <a href="http://siobhonlegan.com/2022-systMed-genomics/2.3dataViz.html">dataViz</a> or find a copy of the <code>.Rmd</code> file <a href="https://raw.githubusercontent.com/siobhon-egan/2022-systMed-genomics/master/2.3dataViz.Rmd">here</a>.</p>
 </div>
 <div id="install-r-packages" class="section level2">
 <h2>Install R packages</h2>

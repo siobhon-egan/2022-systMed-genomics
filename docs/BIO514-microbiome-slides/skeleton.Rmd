@@ -153,17 +153,32 @@ I have also uploaded pre-processed QIIME2 sequence data as outlined in [sequence
 
 - **RData** (*REQUIRED*)
 .small[
-The easiest way to follow along with this tutorial is to download this GitHub repository using either option **1** or **2** below:
+The easiest way to follow along with this tutorial is to download this GitHub repository using either option **A** or **B** below:
 
-1. Go to https://github.com/siobhon-egan/2022-systMed-genomics and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
+A. Go to https://github.com/siobhon-egan/2022-systMed-genomics and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
 
-2. Use terminal and clone the GitHub repo.
+B. Use terminal and clone the GitHub repo.
 ]
 ```
 git clone https://github.com/siobhon-egan/2022-systMed-genomics.git
 ```
+---
 
-In the **data/BIO514/** directory you will find:
+## Setup `r top_icon("download")`
+
+- **RData** (*REQUIRED*)...continued
+
+>Alternatively if you are using the RStudio cloud server as part of the BIO513 unit I have include the data we will need for today's lesson in the directory **data/BIO514-microbiome** directory.
+
+You can then just create your own Rmarkdown file and save in the *home/* directory. You can copy the code chunks in the script on the webpage [dataViz](http://siobhonlegan.com/2022-systMed-genomics/2.3dataViz.html) or find a copy of the `.Rmd` file [here](https://raw.githubusercontent.com/siobhon-egan/2022-systMed-genomics/master/2.3dataViz.Rmd).
+
+---
+
+## Setup `r top_icon("download")`
+
+- **RData** (*REQUIRED*)...continued
+
+In the **data/BIO514-microbiome/** directory you will find:
 - Three `.csv` files which contain the output from the QIIME2 pipeline. The files are: (1) otu_tabe (count data), (2) tax_table (taxonomy) and (3) sam_data (sample meatdata).
 - An `.Rdata` file which we will load into R for the analysis - really this is just a file that contains all three of the spreadsheets above in an R format that is already formatted and ready to go for analysis.
 

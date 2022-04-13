@@ -58,8 +58,8 @@ Today we will be doing through some microbiome bioinformatics.
 
 Workshop notes and data available:
 
-GitHub code repository `r top_icon("github")` [`siobhon-egan/2022-systMed-genomics`](http://github.com/siobhon-egan/2022-systMed-genomics)          
-Website with information & tutorials `r top_icon("link")` [`siobhonlegan.com/2022-systMed-genomics`](http://siobhonlegan.com/2022-systMed-genomics)
+GitHub code repository `r icons::fontawesome("link")` [`siobhon-egan/2022-systMed-genomics`](http://github.com/siobhon-egan/2022-systMed-genomics)          
+Website with information & tutorials `r icons::fontawesome("github")` [`siobhonlegan.com/2022-systMed-genomics`](http://siobhonlegan.com/2022-systMed-genomics)
 
 ---
 class: murdoch-red
@@ -153,17 +153,32 @@ I have also uploaded pre-processed QIIME2 sequence data as outlined in [sequence
 
 - **RData** (*REQUIRED*)
 .small[
-The easiest way to follow along with this tutorial is to download this GitHub repository using either option **1** or **2** below:
+The easiest way to follow along with this tutorial is to download this GitHub repository using either option **A** or **B** below:
 
-1. Go to https://github.com/siobhon-egan/2022-systMed-genomics and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
+A. Go to https://github.com/siobhon-egan/2022-systMed-genomics and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
 
-2. Use terminal and clone the GitHub repo.
+B. Use terminal and clone the GitHub repo.
 ]
 ```
 git clone https://github.com/siobhon-egan/2022-systMed-genomics.git
 ```
+---
 
-In the **data/BIO514/** directory you will find:
+## Setup `r top_icon("download")`
+
+- **RData** (*REQUIRED*)...continued
+
+>Alternatively if you are using the RStudio cloud server as part of the BIO513 unit I have include the data we will need for today's lesson in the directory **data/BIO514-microbiome** directory.
+
+You can then just create your own Rmarkdown file and save in the *home/* directory. You can copy the code chunks in the script on the webpage [dataViz](http://siobhonlegan.com/2022-systMed-genomics/2.3dataViz.html) or find a copy of the `.Rmd` file [here](https://raw.githubusercontent.com/siobhon-egan/2022-systMed-genomics/master/2.3dataViz.Rmd).
+
+---
+
+## Setup `r top_icon("download")`
+
+- **RData** (*REQUIRED*)...continued
+
+In the **data/BIO514-microbiome/** directory you will find:
 - Three `.csv` files which contain the output from the QIIME2 pipeline. The files are: (1) otu_tabe (count data), (2) tax_table (taxonomy) and (3) sam_data (sample meatdata).
 - An `.Rdata` file which we will load into R for the analysis - really this is just a file that contains all three of the spreadsheets above in an R format that is already formatted and ready to go for analysis.
 
@@ -676,7 +691,7 @@ There are two major outputs from the process above.
 pkgs <- c("readr", "rmarkdown")
 library("DT"); library("dplyr")
 lapply(pkgs, require, character.only = TRUE)
-otu_table <- read_csv("../data/BIO514/otu_table.csv", skip = 1, col_names=FALSE)
+otu_table <- read_csv("../data/BIO514-microbiome/otu_table.csv", skip = 1, col_names=FALSE)
 otu_table <- rename(otu_table, Sample_name = X1)
 otu_table_sub <- select(otu_table, Sample_name, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15, X16, X17, X18, X19, X20)
 ```
@@ -705,7 +720,7 @@ otu_table_sub %>%
 
 ```{r include=FALSE}
 # read data
-tax_table <- read_csv("../data/BIO514/tax_table.csv")
+tax_table <- read_csv("../data/BIO514-microbiome/tax_table.csv")
 # To make it easier viewing remove sequence name in first column
 drop <- c("X1")
 df_tax = tax_table[,!(names(tax_table) %in% drop)]
@@ -928,7 +943,7 @@ lapply(pkgs, require, character.only = TRUE)
 Load data in RData - downloaded from https://github.com/ka-west/PBS_manuscript
 
 ```{r, eval=TRUE}
-load("../data/BIO514/PBS_data.Rdata")
+load("../data/BIO514-microbiome/PBS_data.Rdata")
 # Quick glance at phyloseq object
 ps_M
 ```
@@ -1251,7 +1266,7 @@ top_tax <- plot_taxa_boxplot(ps_M,
 ---
 `r top_icon("chart-bar")`
 
-```{r echo=FALSE, fig.height=8.5, fig.width=15}
+```{r echo=FALSE, fig.height=8, fig.width=15}
 top_tax
 ```
 
@@ -1326,6 +1341,10 @@ p.famrel.heatmap <- plot_composition(pseq.famlog,
 ```{r echo=FALSE, fig.height=8.5, fig.width=13}
 p.famrel.heatmap
 ```
+
+---
+`r top_icon("chart-bar")`
+
 .small[
 To view interactively execute the following R code.
 `ggplotly(p.famrel.heatmap)`
@@ -1333,7 +1352,7 @@ To view interactively execute the following R code.
 
 ---
 
-## Betadiversity `r top_icon("chart-bar")`
+## Beta diversity `r top_icon("chart-bar")`
 
 Variation of microbial communities between samples. Beta diversity shows the different between microbial communities from different environments.
 
@@ -1702,7 +1721,6 @@ Here is one of my favourite links for all things microbiome and R.
 ---
 
 class: murdoch-lg-richblack
-background-image: url(assets/MU_ANPC_red.jpg)
 background-size: 260px
 background-position: 5% 95%
 
@@ -1711,15 +1729,15 @@ background-position: 5% 95%
 .pull-right[.pull-down[
 
 <a href="mailto:siobhon.egan@murdoch.edu.au">
-.white[`r top_icon("paper-plane")` siobhon.egan@murdoch.edu.au]
+.white[`r icons::fontawesome("paper-plane")` siobhon.egan@murdoch.edu.au]
 </a>
 
 <a href="http://siobhonlegan.com/2022-systMed-genomics">
-.white[`r top_icon("link")` siobhonlegan.com/2022-systMed-genomics]
+.white[`r icons::fontawesome("link")` siobhonlegan.com/2022-systMed-genomics]
 </a>
 
-<a href="http://siobhon-egan.github.io/2022-systMed-genomics">
-.white[`r top_icon("github")` siobhon-egan.github.io/2022-systMed-genomics]
+<a href="http://github.com/siobhon-egan/2022-systMed-genomics">
+.white[`r icons::fontawesome("github")` github.com/siobhon-egan/2022-systMed-genomics]
 </a>
 
 <br><br><br>
