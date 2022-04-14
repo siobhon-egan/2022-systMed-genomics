@@ -9,13 +9,34 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Sequence data
+## Software
+
+**REQUIRED** - We will be using RStudio to analyse the data set. It is recommend you have the following installed: [*RStudio version 1.4*](https://rstudio.com/products/rstudio/download/) or later and [*R version 4.0*](https://www.r-project.org/) or later. Further details on getting started in RStudio [here](http://siobhonlegan.com/research_site/rstudio/).
+
+## Download data
 
 If you are following along within the BIO513 google RStudio cloud the data is available for you in the directory **data/**.
 
-Otherwise you can download the data from the repositories below
+### Data files and scripts
 
-### Illumina data
+If you are following along on your own computer the easiest way is to download this GitHub repository using either option **A** or **B** below:
+
+A.  Go to <https://github.com/siobhon-egan/2022-systMed-genomics> and click on the green **Code** button. Select **Download ZIP**, open/unzip the file. Open the `.Rmd` files in RStudio you will be able to follow along for the data analysis.
+
+B.  Use terminal and clone the GitHub repo.
+
+```
+git clone https://github.com/siobhon-egan/2022-systMed-genomics.git
+```
+
+Many of the data files used are contained in the **data/** directory for you.
+
+
+### Sequence data
+
+As raw `.fastq` sequence files are large I have not included this within the GitHub repo. You can download them following instructions below:
+
+#### Illumina data
 
 You can retrieve the data from  <https://sra-explorer.info> and search for project accession `PRJNA493625`. Make sure you follow the same data directory location (i.e. **data/ngs/illumina** to ensure code below runs smoothly).
 
@@ -34,7 +55,7 @@ curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_1.fa
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_2.fastq.gz -o SRR7943539_16S_V4_of_human_feces_PBS43_2.fastq.gz
 ```
 
-### PacBio data
+#### PacBio data
 
 You can retrieve the data from  <https://sra-explorer.info> and search for project accession `PRJNA521754`. Make sure you follow the same data directory location (i.e. **data/ngs/pacbio** to ensure code below runs smoothly).
 

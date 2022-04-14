@@ -9,6 +9,8 @@ navbar:
     - text: "BIO 513"
       icon: fas fa-book-open
       menu:
+       - text: "Introduction"
+         href: 1.introBIO513.html
        - text: "Set up"
          href: 1.setup.html
        - text: "-----------"

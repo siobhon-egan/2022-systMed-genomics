@@ -409,12 +409,28 @@ div.tocify {
 </div>
 
 
-<div id="sequence-data" class="section level2">
-<h2>Sequence data</h2>
+<div id="software" class="section level2">
+<h2>Software</h2>
+<p><strong>REQUIRED</strong> - We will be using RStudio to analyse the data set. It is recommend you have the following installed: <a href="https://rstudio.com/products/rstudio/download/"><em>RStudio version 1.4</em></a> or later and <a href="https://www.r-project.org/"><em>R version 4.0</em></a> or later. Further details on getting started in RStudio <a href="http://siobhonlegan.com/research_site/rstudio/">here</a>.</p>
+</div>
+<div id="download-data" class="section level2">
+<h2>Download data</h2>
 <p>If you are following along within the BIO513 google RStudio cloud the data is available for you in the directory <strong>data/</strong>.</p>
-<p>Otherwise you can download the data from the repositories below</p>
-<div id="illumina-data" class="section level3">
-<h3>Illumina data</h3>
+<div id="data-files-and-scripts" class="section level3">
+<h3>Data files and scripts</h3>
+<p>If you are following along on your own computer the easiest way is to download this GitHub repository using either option <strong>A</strong> or <strong>B</strong> below:</p>
+<ol style="list-style-type: upper-alpha">
+<li><p>Go to <a href="https://github.com/siobhon-egan/2022-systMed-genomics" class="uri">https://github.com/siobhon-egan/2022-systMed-genomics</a> and click on the green <strong>Code</strong> button. Select <strong>Download ZIP</strong>, open/unzip the file. Open the <code>.Rmd</code> files in RStudio you will be able to follow along for the data analysis.</p></li>
+<li><p>Use terminal and clone the GitHub repo.</p></li>
+</ol>
+<pre><code>git clone https://github.com/siobhon-egan/2022-systMed-genomics.git</code></pre>
+<p>Many of the data files used are contained in the <strong>data/</strong> directory for you.</p>
+</div>
+<div id="sequence-data" class="section level3">
+<h3>Sequence data</h3>
+<p>As raw <code>.fastq</code> sequence files are large I have not included this within the GitHub repo. You can download them following instructions below:</p>
+<div id="illumina-data" class="section level4">
+<h4>Illumina data</h4>
 <p>You can retrieve the data from <a href="https://sra-explorer.info" class="uri">https://sra-explorer.info</a> and search for project accession <code>PRJNA493625</code>. Make sure you follow the same data directory location (i.e. <strong>data/ngs/illumina</strong> to ensure code below runs smoothly).</p>
 <pre class="bash"><code>#!/usr/bin/env bash
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/003/SRR7943543/SRR7943543_1.fastq.gz -o SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq.gz
@@ -429,14 +445,15 @@ curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/008/SRR7943538/SRR7943538_2.fa
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_1.fastq.gz -o SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq.gz
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR794/009/SRR7943539/SRR7943539_2.fastq.gz -o SRR7943539_16S_V4_of_human_feces_PBS43_2.fastq.gz</code></pre>
 </div>
-<div id="pacbio-data" class="section level3">
-<h3>PacBio data</h3>
+<div id="pacbio-data" class="section level4">
+<h4>PacBio data</h4>
 <p>You can retrieve the data from <a href="https://sra-explorer.info" class="uri">https://sra-explorer.info</a> and search for project accession <code>PRJNA521754</code>. Make sure you follow the same data directory location (i.e. <strong>data/ngs/pacbio</strong> to ensure code below runs smoothly).</p>
 <pre class="bash"><code>#!/usr/bin/env bash
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/009/SRR8557479/SRR8557479_subreads.fastq.gz -o SRR8557479_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/000/SRR8557480/SRR8557480_subreads.fastq.gz -o SRR8557480_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/008/SRR8557478/SRR8557478_subreads.fastq.gz -o SRR8557478_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz
 curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR855/007/SRR8557477/SRR8557477_subreads.fastq.gz -o SRR8557477_Full-length_16S_amplicon_sequencing_human_feces_subreads.fastq.gz</code></pre>
+</div>
 </div>
 </div>
 

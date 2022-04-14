@@ -3,3 +3,4 @@
 tmp/
 data/ngs/pacbio/*
 data/ngs/illumina/*.fastq.gz
+data/ngs/illumina/*.fastq

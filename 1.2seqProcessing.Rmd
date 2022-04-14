@@ -79,7 +79,7 @@ project to look into.
 If you are following along within the BIO513 google RStudio cloud the data is available for you in the directory **data/**.
 
 
-**Unzip files** using the command `gunzip`
+**Zipping files** using the command `gunzip` and `gzip`
 
 ``` {bash, eval = FALSE, include = TRUE}
 gunzip data/ngs/illumina/*.fastq.gz
@@ -132,16 +132,45 @@ The **red line** shows the scaled proportion of reads that extend to at least th
 The forward reads are good quality. We can see that for the reverse reads quality drops off much more significantly, especially at the end - which is common in Illumina sequencing. 
 This isn't too worrisome, as DADA2 incorporates quality information into its error model which makes the algorithm robust to lower quality sequence, but trimming as the average qualities crash will improve the algorithm's sensitivity to rare sequence variants. 
 
-> Considerations for your own data: How much do your reads overlap? Some
-> assays rely on complete overlap and therefore use read quality for
-> filtering. But you need to consider how much your reads overlap for
-> this step. Your `truncLen` must be large enough to maintain
-> `20 + biological.length.variation` nucleotides of overlap between
-> them.
+:::: {.content-box-info-lg}
+**Considerations for your own data** `r icons::fontawesome$solid$exclamation`
+How much do your reads overlap? Some assays rely on complete overlap and therefore use read quality for filtering. But you need to consider how much your reads overlap for this step. Your `truncLen` must be large enough to maintain `20 + biological.length.variation` nucleotides of overlap between them.
+::::
 
+---
+
+**STOP and compare with PacBio**
+``` {bash, eval = FALSE, include = TRUE}
+gunzip data/ngs/pacbio/*.fastq.gz
+```
+
+Set path to where the fastq files are
+
+```{r pacbioraw, eval = FALSE, warning=FALSE, message=FALSE}
+# Path to raw data
+path2 <- "data/ngs/pacbio"
+list.files(path2)
+```
+
+Set forward and reverse file naming conventions
+
+```{r, eval = FALSE}
+# In this example forward and reverse fastq are denoted by either *1.fastq or *2.fastq.
+fns <- sort(list.files(path2, full.names = TRUE))
+# Extract sample names
+sample.names2 <- sapply(strsplit(basename(fns), "_"), `[`, 1)
+# check files names are correct
+sample.names2
+```
+
+```{r, eval=FALSE}
+plotQualityProfile(fns[1])
+```
+
+---
 ## Filter and trim
 
-Assign the filenames for the filtered fastq.gz files.
+Assign the file names for the filtered `.fastq.gz` files.
 
 **Place filtered files in filtered/ subdirectory**
 
@@ -225,8 +254,9 @@ mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
 head(mergers[[1]])
 ```
 
-:::: {.content-box .content-box-danger}
-Considerations for your own data: Most of your reads should successfully merge. If that is not the case upstream parameters may need to be revisited: Did you trim away the overlap between your reads?
+:::: {.content-box-info-lg}
+**Considerations for your own data** `r icons::fontawesome$solid$exclamation`
+Most of your reads should successfully merge. If that is not the case upstream parameters may need to be revisited: Did you trim away the overlap between your reads?
 ::::
 
 ## Construct sequence table
@@ -245,8 +275,9 @@ dim(seqtab)
 table(nchar(getSequences(seqtab))) 
 ```
 
-:::: {.content-box .content-box-danger}
-Considerations for your own data: Sequences that are much longer or shorter than expected may be the result of non-specific priming. You can remove non-target-length sequences from your sequence table (eg. `seqtab2 <- seqtab[,nchar(colnames(seqtab)) %in% 250:256`]). This is analogous to “cutting a band” in-silico to get amplicons of the targeted length
+:::: {.content-box-info-lg}
+**Considerations for your own data** `r icons::fontawesome$solid$exclamation`
+Sequences that are much longer or shorter than expected may be the result of non-specific priming. You can remove non-target-length sequences from your sequence table (eg. `seqtab2 <- seqtab[,nchar(colnames(seqtab)) %in% 250:256`]). This is analogous to “cutting a band” in-silico to get amplicons of the targeted length
 ::::
 
 ## Remove chimeras
@@ -293,8 +324,9 @@ writeXStringSet(dna, "data/ngs/illumina/output/asv.fasta")
 
 The frequency of chimeric sequences varies substantially from dataset to dataset, and depends on on factors including experimental procedures and sample complexity. Here chimeras make up about 21% of the merged sequence variants, but when we account for the abundances of those variants we see they account for only about 4% of the merged sequence reads.
 
-:::: {.content-box .content-box-danger}
-Considerations for your own data: Most of your reads should remain after chimera removal (it is not uncommon for a majority of sequence variants to be removed though). If most of your reads were removed as chimeric, upstream processing may need to be revisited. In almost all cases this is caused by primer sequences with ambiguous nucleotides that were not removed prior to beginning the DADA2 pipeline.
+:::: {.content-box-info-lg}
+**Considerations for your own data** `r icons::fontawesome$solid$exclamation`
+Most of your reads should remain after chimera removal (it is not uncommon for a majority of sequence variants to be removed though). If most of your reads were removed as chimeric, upstream processing may need to be revisited. In almost all cases this is caused by primer sequences with ambiguous nucleotides that were not removed prior to beginning the DADA2 pipeline.
 ::::
 
 ## Track reads through the pipeline
@@ -333,9 +365,8 @@ Let's inspect the taxonomic assignments:
 
 ```{r}
 # Load in prepared taxa data
-
-# show taxa file
 load("data/ngs/illumina/output/taxa.RData")
+# show taxa file
 taxa.print <- taxa # Removing sequence rownames for display only
 rownames(taxa.print) <- NULL
 head(taxa.print)
@@ -386,7 +417,7 @@ dnarevcom <- reverseComplement(dna)
 dnacom <- reverseComplement(dna)
 ```
 
-:::: {.content-box .content-box-info}
+:::: {.content-box-info-lg}
 The GC pair is bound by three hydrogen bonds, while AT pairs are bound by two hydrogen bonds. And so,
 The GC content affects the stability of DNA.
 The GC content affects the secondary structure of mRNA.
