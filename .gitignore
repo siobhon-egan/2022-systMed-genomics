@@ -2,5 +2,7 @@
 .Rproj.user/
 tmp/
 data/ngs/pacbio/*
-data/ngs/illumina/*.fastq.gz
 data/ngs/illumina/*.fastq
+docs/data/ngs/pacbio/
+docs/data/ngs/illumina/filtered/
+docs/data/ngs/illumina/*.fastq

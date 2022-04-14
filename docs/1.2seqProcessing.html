@@ -529,16 +529,15 @@ library(ape)</code></pre>
 <pre class="r"><code># Path to raw data
 path &lt;- &quot;data/ngs/illumina&quot;
 list.files(path)</code></pre>
-<pre><code>##  [1] &quot;filtered&quot;                                      
-##  [2] &quot;output&quot;                                        
-##  [3] &quot;SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq&quot;
-##  [4] &quot;SRR7943538_16S_V4_of_human_feces_PBS49_2.fastq&quot;
-##  [5] &quot;SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq&quot;
-##  [6] &quot;SRR7943539_16S_V4_of_human_feces_PBS43_2.fastq&quot;
-##  [7] &quot;SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq&quot;
-##  [8] &quot;SRR7943543_16S_V4_of_human_feces_PBS39_2.fastq&quot;
-##  [9] &quot;SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq&quot;
-## [10] &quot;SRR7943544_16S_V4_of_human_feces_PBS63_2.fastq&quot;</code></pre>
+<pre><code>## [1] &quot;output&quot;                                        
+## [2] &quot;SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq&quot;
+## [3] &quot;SRR7943538_16S_V4_of_human_feces_PBS49_2.fastq&quot;
+## [4] &quot;SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq&quot;
+## [5] &quot;SRR7943539_16S_V4_of_human_feces_PBS43_2.fastq&quot;
+## [6] &quot;SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq&quot;
+## [7] &quot;SRR7943543_16S_V4_of_human_feces_PBS39_2.fastq&quot;
+## [8] &quot;SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq&quot;
+## [9] &quot;SRR7943544_16S_V4_of_human_feces_PBS63_2.fastq&quot;</code></pre>
 <p>Set forward and reverse file naming conventions</p>
 <pre class="r"><code># In this example forward and reverse fastq are denoted by either *1.fastq or *2.fastq.
 fnFs &lt;- sort(list.files(path, pattern=&quot;_1.fastq&quot;, full.names = TRUE))
@@ -588,241 +587,194 @@ sample.names2 &lt;- sapply(strsplit(basename(fns), &quot;_&quot;), `[`, 1)
 # check files names are correct
 sample.names2</code></pre>
 <pre class="r"><code>plotQualityProfile(fns[1])</code></pre>
-<table style="width:6%;">
-<colgroup>
-<col width="5%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td>## Filter and trim</td>
-</tr>
-<tr class="even">
-<td>Assign the file names for the filtered <code>.fastq.gz</code> files.</td>
-</tr>
-<tr class="odd">
-<td><strong>Place filtered files in filtered/ subdirectory</strong></td>
-</tr>
-<tr class="even">
-<td><code>r filtFs &lt;- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz")) filtRs &lt;- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz")) names(filtFs) &lt;- sample.names names(filtRs) &lt;- sample.names</code></td>
-</tr>
-<tr class="odd">
-<td>We’ll use standard filtering parameters: <code>maxN=0</code> (DADA2 requires no Ns), <code>truncQ=2</code>, <code>rm.phix=TRUE</code> and <code>maxEE=2</code>. The <code>maxEE</code> parameter sets the maximum number of “expected errors” allowed in a read, which is <a href="https://academic.oup.com/bioinformatics/article/31/21/3476/194979">a better filter than simply averaging quality scores</a>.</td>
-</tr>
-<tr class="even">
-<td><code>r out &lt;- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300,160), maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE, compress=TRUE, multithread=TRUE) head(out)</code></td>
-</tr>
-<tr class="odd">
-<td><code>##                                                reads.in reads.out ## SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq    23638     15693 ## SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq    26329     17832 ## SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq    31301     19236 ## SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq    39768     27496</code></td>
-</tr>
-<tr class="even">
-<td>## Learn errors</td>
-</tr>
-<tr class="odd">
-<td>The DADA2 algorithm makes use of a parametric error model (<code>err</code>) and every amplicon dataset has a different set of error rates. The <code>learnErrors</code> method learns this error model from the data, by alternating estimation of the error rates and inference of sample composition until they converge on a jointly consistent solution. As in many machine-learning problems, the algorithm must begin with an initial guess, for which the maximum possible error rates in this data are used (the error rates if only the most abundant sequence is correct and all the rest are errors).</td>
-</tr>
-<tr class="even">
-<td><em>The following runs in about 2 minutes on a 2019 Macbook Pro on the dataset used in the tutorial</em></td>
-</tr>
-<tr class="odd">
-<td><code>r errF &lt;- learnErrors(filtFs, multithread=TRUE)</code></td>
-</tr>
-<tr class="even">
-<td><code>## 24077100 total bases in 80257 reads from 4 samples will be used for learning the error rates.</code></td>
-</tr>
-<tr class="odd">
-<td><code>r errR &lt;- learnErrors(filtRs, multithread=TRUE)</code></td>
-</tr>
-<tr class="even">
-<td><code>## 12841120 total bases in 80257 reads from 4 samples will be used for learning the error rates.</code></td>
-</tr>
-<tr class="odd">
-<td>It is always worthwhile, as a sanity check if nothing else, to visualize the estimated error rates:</td>
-</tr>
-<tr class="even">
-<td><code>r plotErrors(errF, nominalQ=TRUE)</code></td>
-</tr>
-<tr class="odd">
-<td><code>## Warning: Transformation introduced infinite values in continuous y-axis ## Transformation introduced infinite values in continuous y-axis</code></td>
-</tr>
-<tr class="even">
-<td><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-11-1.png" width="672" /></td>
-</tr>
-<tr class="odd">
-<td>The error rates for each possible transition (A–&gt;C, A–&gt;G,…) are shown. Points are the observed error rates for each consensus quality score. The black line shows the estimated error rates after convergence of the machine-learning algorithm. The red line shows the error rates expected under the nominal definition of the Q-score. Here the estimated error rates (black line) are a good fit to the observed rates (points), and the error rates drop with increased quality as expected. Everything looks reasonable and we proceed with confidence.</td>
-</tr>
-<tr class="even">
-<td>## Sample Inference</td>
-</tr>
-<tr class="odd">
-<td>We are now ready to apply the core sample inference algorithm to the filtered and trimmed sequence data.</td>
-</tr>
-<tr class="even">
-<td><code>r dadaFs &lt;- dada(filtFs, err=errF, multithread=TRUE)</code></td>
-</tr>
-<tr class="odd">
-<td><code>## Sample 1 - 15693 reads in 6413 unique sequences. ## Sample 2 - 17832 reads in 7633 unique sequences. ## Sample 3 - 19236 reads in 8784 unique sequences. ## Sample 4 - 27496 reads in 11160 unique sequences.</code></td>
-</tr>
-<tr class="even">
-<td><code>r dadaRs &lt;- dada(filtRs, err=errR, multithread=TRUE)</code></td>
-</tr>
-<tr class="odd">
-<td><code>## Sample 1 - 15693 reads in 2314 unique sequences. ## Sample 2 - 17832 reads in 2562 unique sequences. ## Sample 3 - 19236 reads in 3104 unique sequences. ## Sample 4 - 27496 reads in 3752 unique sequences.</code></td>
-</tr>
-<tr class="even">
-<td>Inspecting the returned dada-class object:</td>
-</tr>
-<tr class="odd">
-<td><code>r dadaFs[[1]]</code></td>
-</tr>
-<tr class="even">
-<td><code>## dada-class: object describing DADA2 denoising results ## 240 sequence variants were inferred from 6413 input unique sequences. ## Key parameters: OMEGA_A = 1e-40, OMEGA_C = 1e-40, BAND_SIZE = 16</code></td>
-</tr>
-<tr class="odd">
-<td>## Merge paired reads</td>
-</tr>
-<tr class="even">
-<td>We now merge the forward and reverse reads together to obtain the full denoised sequences. Merging is performed by aligning the denoised forward reads with the reverse-complement of the corresponding denoised reverse reads, and then constructing the merged “contig” sequences. By default, merged sequences are only output if the forward and reverse reads overlap by at least 12 bases, and are identical to each other in the overlap region (but these conditions can be changed via function arguments).</td>
-</tr>
-<tr class="odd">
-<td><code>r mergers &lt;- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)</code></td>
-</tr>
-<tr class="even">
-<td><code>## 14023 paired-reads (in 233 unique pairings) successfully merged out of 14803 (in 371 pairings) input.</code></td>
-</tr>
-<tr class="odd">
-<td><code>## 15738 paired-reads (in 229 unique pairings) successfully merged out of 16940 (in 401 pairings) input.</code></td>
-</tr>
-<tr class="even">
-<td><code>## 17360 paired-reads (in 255 unique pairings) successfully merged out of 18301 (in 476 pairings) input.</code></td>
-</tr>
-<tr class="odd">
-<td><code>## 25158 paired-reads (in 358 unique pairings) successfully merged out of 26388 (in 671 pairings) input.</code></td>
-</tr>
-<tr class="even">
-<td><code>r # Inspect the merger data.frame from the first sample head(mergers[[1]])</code></td>
-</tr>
-<tr class="odd">
-<td><code>##                                                                                                                                                                                                                                                                                                                                                              sequence ## 1   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCGCATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA ## 2 GAGTTTGATTATGGCTCAGGATGAACGCTAGCGACAGGCCTAACACATGCAAGTCGAGGGGCAGCGGGGAGGTAGCAATACCTTTGCCGGCGACCGGCGCACGGGTGAGTAACACGTATGCAATCCACCTGTAACAGGGGGATAACCCGGAGAAATCCGGACTAATACCCCATAATATGGGCGCTCCGCATGGAGAGTTCATTAAAGAGAGCAATTTTGGTTACAGACGAGCATGCGCTCCATTAGCCAGTTGGCGGGGTAACGGCCCACCAAGGCGACGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA ## 3    GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCATCAGGAAGAAAGCTTGCTTTCTTTGCTGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCCTTTACTCGGGGATAGCCTTTCGAAAGAAAGATTAATACCCGATGGCATAATGATTCCGCATGGTTTCATTATTAAAGGATTCCGGTAAAGGATGGGGATGCGTTCCATTAGGTTGTTGGTGAGGTAACGGCTCACCAAGCCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA ## 4   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCACATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA ## 5   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTTCACATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA ## 6  GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATTTTAGTTTGCTTGCAAACTGAAGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGATAACTCCGGAATAGCCTTTCGAAAGAAAGATTAATACCGGATAGTATACGAATATCGCATGATATTTTTATTAAAGAATTTCGGTTATCGATGGGGATGCGTTCCATTAGTTTGTTGGCGGGGTAACGGCCCACCAAGACTACGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA ##   abundance forward reverse nmatch nmismatch nindel prefer accept ## 1       755       1       1    107         0      0      2   TRUE ## 2       344       2       3    105         0      0      2   TRUE ## 3       305       3       4    108         0      0      2   TRUE ## 4       293      36       1    107         0      0      2   TRUE ## 5       279       4       1    107         0      0      2   TRUE ## 6       259       6       2    106         0      0      2   TRUE</code></td>
-</tr>
-<tr class="even">
-<td>:::: {.content-box-info-lg} <strong>Considerations for your own data</strong> <svg viewBox="0 0 192 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M176 432c0 44.112-35.888 80-80 80s-80-35.888-80-80 35.888-80 80-80 80 35.888 80 80zM25.26 25.199l13.6 272C39.499 309.972 50.041 320 62.83 320h66.34c12.789 0 23.331-10.028 23.97-22.801l13.6-272C167.425 11.49 156.496 0 142.77 0H49.23C35.504 0 24.575 11.49 25.26 25.199z"></path></svg> Most of your reads should successfully merge. If that is not the case upstream parameters may need to be revisited: Did you trim away the overlap between your reads? ::::</td>
-</tr>
-<tr class="odd">
-<td>## Construct sequence table</td>
-</tr>
-<tr class="even">
-<td>We can now construct an amplicon sequence variant table (ASV) table, a higher-resolution version of the OTU table produced by traditional methods.</td>
-</tr>
-<tr class="odd">
-<td><code>r seqtab &lt;- makeSequenceTable(mergers) dim(seqtab)</code></td>
-</tr>
-<tr class="even">
-<td><code>## [1]   4 930</code></td>
-</tr>
-<tr class="odd">
-<td><code>r # Inspect distribution of sequence lengths table(nchar(getSequences(seqtab)))</code></td>
-</tr>
-<tr class="even">
-<td><code>## ## 325 335 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 ##   1  20   3   7   6   1   2  28  18  18 109  49  19  32  66  58  98  96   2   1 ## 359 360 361 362 363 364 365 366 367 368 370 371 372 376 377 378 379 380 398 448 ##   6   3  30  63  48  58  19   2   3   5  39   1   5   1   1   2   1   4   4   1</code></td>
-</tr>
-<tr class="odd">
-<td>:::: {.content-box-info-lg} <strong>Considerations for your own data</strong> <svg viewBox="0 0 192 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M176 432c0 44.112-35.888 80-80 80s-80-35.888-80-80 35.888-80 80-80 80 35.888 80 80zM25.26 25.199l13.6 272C39.499 309.972 50.041 320 62.83 320h66.34c12.789 0 23.331-10.028 23.97-22.801l13.6-272C167.425 11.49 156.496 0 142.77 0H49.23C35.504 0 24.575 11.49 25.26 25.199z"></path></svg> Sequences that are much longer or shorter than expected may be the result of non-specific priming. You can remove non-target-length sequences from your sequence table (eg. <code>seqtab2 &lt;- seqtab[,nchar(colnames(seqtab)) %in% 250:256</code>]). This is analogous to “cutting a band” in-silico to get amplicons of the targeted length ::::</td>
-</tr>
-<tr class="even">
-<td>## Remove chimeras</td>
-</tr>
-<tr class="odd">
-<td>The core dada method corrects substitution and indel errors, but chimeras remain. Fortunately, the accuracy of sequence variants after denoising makes identifying chimeric ASVs simpler than when dealing with fuzzy OTUs. Chimeric sequences are identified if they can be exactly reconstructed by combining a left-segment and a right-segment from two more abundant “parent” sequences.</td>
-</tr>
-<tr class="even">
-<td><code>r seqtab.nochim &lt;- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)</code></td>
-</tr>
-<tr class="odd">
-<td><code>## Identified 325 bimeras out of 930 input sequences.</code></td>
-</tr>
-<tr class="even">
-<td>Let’s check how many ASVs we end up with, we’ll also check what proportion of the original sequences we have retained.</td>
-</tr>
-<tr class="odd">
-<td><code>r dim(seqtab.nochim)</code></td>
-</tr>
-<tr class="even">
-<td><code>## [1]   4 605</code></td>
-</tr>
-<tr class="odd">
-<td><code>r sum(seqtab.nochim)/sum(seqtab)</code></td>
-</tr>
-<tr class="even">
-<td><code>## [1] 0.7642884</code></td>
-</tr>
-<tr class="odd">
-<td>We often want to do further inspect or perform some further analysis using the ASV count table so we will save it as a csv file.</td>
-</tr>
-<tr class="even">
-<td><code>r asv_tab &lt;- as.data.frame(t(seqtab.nochim)) N &lt;- nrow(asv_tab) x = 1:N asv_tab$ASVid &lt;- paste("ASV",x, sep = "_") asv_tab &lt;- rownames_to_column(asv_tab, var = "ASVseq") asv_tab &lt;- asv_tab[, c(6, 1, 2, 3, 4, 5)] # write csv file write.csv(asv_tab, "data/ngs/illumina/output/asvtab.csv")</code></td>
-</tr>
-<tr class="odd">
-<td>We also want to extract the ASV sequences and store in a <code>.fasta</code> format file.</td>
-</tr>
-<tr class="even">
-<td><code>r seqs &lt;- asv_tab$ASVseq names(seqs) = asv_tab$ASVid dna = DNAStringSet(seqs) # write fasta file writeXStringSet(dna, "data/ngs/illumina/output/asv.fasta")</code></td>
-</tr>
-<tr class="odd">
-<td>The frequency of chimeric sequences varies substantially from dataset to dataset, and depends on on factors including experimental procedures and sample complexity. Here chimeras make up about 21% of the merged sequence variants, but when we account for the abundances of those variants we see they account for only about 4% of the merged sequence reads.</td>
-</tr>
-<tr class="even">
-<td>:::: {.content-box-info-lg} <strong>Considerations for your own data</strong> <svg viewBox="0 0 192 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M176 432c0 44.112-35.888 80-80 80s-80-35.888-80-80 35.888-80 80-80 80 35.888 80 80zM25.26 25.199l13.6 272C39.499 309.972 50.041 320 62.83 320h66.34c12.789 0 23.331-10.028 23.97-22.801l13.6-272C167.425 11.49 156.496 0 142.77 0H49.23C35.504 0 24.575 11.49 25.26 25.199z"></path></svg> Most of your reads should remain after chimera removal (it is not uncommon for a majority of sequence variants to be removed though). If most of your reads were removed as chimeric, upstream processing may need to be revisited. In almost all cases this is caused by primer sequences with ambiguous nucleotides that were not removed prior to beginning the DADA2 pipeline. ::::</td>
-</tr>
-<tr class="odd">
-<td>## Track reads through the pipeline</td>
-</tr>
-<tr class="even">
-<td>As a final check of our progress, we’ll look at the number of reads that made it through each step in the pipeline:</td>
-</tr>
-<tr class="odd">
-<td><code>r getN &lt;- function(x) sum(getUniques(x)) track &lt;- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim)) # If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs) colnames(track) &lt;- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim") rownames(track) &lt;- sample.names track</code></td>
-</tr>
-<tr class="even">
-<td><code>##       input filtered denoisedF denoisedR merged nonchim ## PBS49 23638    15693     14864     15540  14023   10504 ## PBS43 26329    17832     17022     17707  15738   12178 ## PBS39 31301    19236     18444     18977  17360   13129 ## PBS63 39768    27496     26527     27274  25158   19431</code></td>
-</tr>
-<tr class="odd">
-<td><code>r # write the track sequence file to csv write.csv(track, "data/ngs/illumina/output/track.csv")</code></td>
-</tr>
-<tr class="even">
-<td>## Assign taxonomy</td>
-</tr>
-<tr class="odd">
-<td>*This is an “I have prepared earlier” bit for you as it requires a large dataset and takes a while to do computationally.</td>
-</tr>
-<tr class="even">
-<td>Download the silva species assignment database from <a href="https://zenodo.org/record/4587955#.YhTZeJNBzek">zenodo repository</a> <code>silva_species_assignment_v138.1.fa.gz</code>.</td>
-</tr>
-<tr class="odd">
-<td>```r taxa &lt;- assignTaxonomy(seqtab.nochim, “/Users/Siobhon/db/silva_nr_v128_train_set.fa.gz”, multithread=TRUE)</td>
-</tr>
-<tr class="even">
-<td>taxa &lt;- addSpecies(taxa, “/Users/Siobhon/db/silva_species_assignment_v138.1.fa.gz”)</td>
-</tr>
-<tr class="odd">
-<td># save rda save(taxa, file = “data/ngs/illumina/output/taxa.RData”) ```</td>
-</tr>
-<tr class="even">
-<td>Let’s inspect the taxonomic assignments:</td>
-</tr>
-<tr class="odd">
-<td><code>r # Load in prepared taxa data load("data/ngs/illumina/output/taxa.RData") # show taxa file taxa.print &lt;- taxa # Removing sequence rownames for display only rownames(taxa.print) &lt;- NULL head(taxa.print)</code></td>
-</tr>
-<tr class="even">
-<td><code>##      Kingdom    Phylum          Class         Order           Family ## [1,] "Bacteria" "Bacteroidetes" "Bacteroidia" "Bacteroidales" "Bacteroidaceae" ## [2,] "Bacteria" "Bacteroidetes" "Bacteroidia" "Bacteroidales" "Rikenellaceae" ## [3,] "Bacteria" "Bacteroidetes" "Bacteroidia" "Bacteroidales" "Bacteroidaceae" ## [4,] "Bacteria" "Bacteroidetes" "Bacteroidia" "Bacteroidales" "Rikenellaceae" ## [5,] "Bacteria" "Bacteroidetes" "Bacteroidia" "Bacteroidales" "Bacteroidaceae" ## [6,] "Bacteria" "Bacteroidetes" "Bacteroidia" "Bacteroidales" "Bacteroidaceae" ##      Genus         Species ## [1,] "Bacteroides" NA ## [2,] "Alistipes"   NA ## [3,] "Bacteroides" NA ## [4,] "Alistipes"   NA ## [5,] "Bacteroides" NA ## [6,] "Bacteroides" NA</code></td>
-</tr>
-<tr class="odd">
-<td>We now also format to save as csv file</td>
-</tr>
-<tr class="even">
-<td><code>r tax_tab &lt;- as.data.frame(taxa.print) N &lt;- nrow(tax_tab) x = 1:N tax_tab$ASVid &lt;- paste("ASV",x, sep = "_") tax_tab &lt;- tax_tab[, c(8, 1, 2, 3, 4, 5, 6, 7)] write.csv(tax_tab, "data/ngs/illumina/output/taxa.csv")</code></td>
-</tr>
-</tbody>
-</table>
+<hr />
+</div>
+<div id="filter-and-trim" class="section level2">
+<h2>Filter and trim</h2>
+<p>Assign the file names for the filtered <code>.fastq.gz</code> files.</p>
+<p><strong>Place filtered files in filtered/ subdirectory</strong></p>
+<pre class="r"><code>filtFs &lt;- file.path(path, &quot;filtered&quot;, paste0(sample.names, &quot;_F_filt.fastq.gz&quot;))
+filtRs &lt;- file.path(path, &quot;filtered&quot;, paste0(sample.names, &quot;_R_filt.fastq.gz&quot;))
+names(filtFs) &lt;- sample.names
+names(filtRs) &lt;- sample.names</code></pre>
+<p>We’ll use standard filtering parameters: <code>maxN=0</code> (DADA2 requires no Ns), <code>truncQ=2</code>, <code>rm.phix=TRUE</code> and <code>maxEE=2</code>. The <code>maxEE</code> parameter sets the maximum number of “expected errors” allowed in a read, which is <a href="https://academic.oup.com/bioinformatics/article/31/21/3476/194979">a better filter than simply averaging quality scores</a>.</p>
+<pre class="r"><code>out &lt;- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300,160),
+              maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+              compress=TRUE, multithread=TRUE)</code></pre>
+<pre><code>## Creating output directory: data/ngs/illumina/filtered</code></pre>
+<pre class="r"><code>head(out)</code></pre>
+<pre><code>##                                                reads.in reads.out
+## SRR7943538_16S_V4_of_human_feces_PBS49_1.fastq    23638     15693
+## SRR7943539_16S_V4_of_human_feces_PBS43_1.fastq    26329     17832
+## SRR7943543_16S_V4_of_human_feces_PBS39_1.fastq    31301     19236
+## SRR7943544_16S_V4_of_human_feces_PBS63_1.fastq    39768     27496</code></pre>
+</div>
+<div id="learn-errors" class="section level2">
+<h2>Learn errors</h2>
+<p>The DADA2 algorithm makes use of a parametric error model (<code>err</code>) and every amplicon dataset has a different set of error rates. The <code>learnErrors</code> method learns this error model from the data, by alternating estimation of the error rates and inference of sample composition until they converge on a jointly consistent solution. As in many machine-learning problems, the algorithm must begin with an initial guess, for which the maximum possible error rates in this data are used (the error rates if only the most abundant sequence is correct and all the rest are errors).</p>
+<p><em>The following runs in about 2 minutes on a 2019 Macbook Pro on the dataset used in the tutorial</em></p>
+<pre class="r"><code>errF &lt;- learnErrors(filtFs, multithread=TRUE)</code></pre>
+<pre><code>## 24077100 total bases in 80257 reads from 4 samples will be used for learning the error rates.</code></pre>
+<pre class="r"><code>errR &lt;- learnErrors(filtRs, multithread=TRUE)</code></pre>
+<pre><code>## 12841120 total bases in 80257 reads from 4 samples will be used for learning the error rates.</code></pre>
+<p>It is always worthwhile, as a sanity check if nothing else, to visualize the estimated error rates:</p>
+<pre class="r"><code>plotErrors(errF, nominalQ=TRUE)</code></pre>
+<pre><code>## Warning: Transformation introduced infinite values in continuous y-axis
+## Transformation introduced infinite values in continuous y-axis</code></pre>
+<p><img src="1.2seqProcessing_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>The error rates for each possible transition (A–&gt;C, A–&gt;G,…) are shown. Points are the observed error rates for each consensus quality score. The black line shows the estimated error rates after convergence of the machine-learning algorithm. The red line shows the error rates expected under the nominal definition of the Q-score. Here the estimated error rates (black line) are a good fit to the observed rates (points), and the error rates drop with increased quality as expected. Everything looks reasonable and we proceed with confidence.</p>
+</div>
+<div id="sample-inference" class="section level2">
+<h2>Sample Inference</h2>
+<p>We are now ready to apply the core sample inference algorithm to the filtered and trimmed sequence data.</p>
+<pre class="r"><code>dadaFs &lt;- dada(filtFs, err=errF, multithread=TRUE)</code></pre>
+<pre><code>## Sample 1 - 15693 reads in 6413 unique sequences.
+## Sample 2 - 17832 reads in 7633 unique sequences.
+## Sample 3 - 19236 reads in 8784 unique sequences.
+## Sample 4 - 27496 reads in 11160 unique sequences.</code></pre>
+<pre class="r"><code>dadaRs &lt;- dada(filtRs, err=errR, multithread=TRUE)</code></pre>
+<pre><code>## Sample 1 - 15693 reads in 2314 unique sequences.
+## Sample 2 - 17832 reads in 2562 unique sequences.
+## Sample 3 - 19236 reads in 3104 unique sequences.
+## Sample 4 - 27496 reads in 3752 unique sequences.</code></pre>
+<p>Inspecting the returned dada-class object:</p>
+<pre class="r"><code>dadaFs[[1]]</code></pre>
+<pre><code>## dada-class: object describing DADA2 denoising results
+## 240 sequence variants were inferred from 6413 input unique sequences.
+## Key parameters: OMEGA_A = 1e-40, OMEGA_C = 1e-40, BAND_SIZE = 16</code></pre>
+</div>
+<div id="merge-paired-reads" class="section level2">
+<h2>Merge paired reads</h2>
+<p>We now merge the forward and reverse reads together to obtain the full denoised sequences. Merging is performed by aligning the denoised forward reads with the reverse-complement of the corresponding denoised reverse reads, and then constructing the merged “contig” sequences. By default, merged sequences are only output if the forward and reverse reads overlap by at least 12 bases, and are identical to each other in the overlap region (but these conditions can be changed via function arguments).</p>
+<pre class="r"><code>mergers &lt;- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)</code></pre>
+<pre><code>## 14023 paired-reads (in 233 unique pairings) successfully merged out of 14803 (in 371 pairings) input.</code></pre>
+<pre><code>## 15738 paired-reads (in 229 unique pairings) successfully merged out of 16940 (in 401 pairings) input.</code></pre>
+<pre><code>## 17360 paired-reads (in 255 unique pairings) successfully merged out of 18301 (in 476 pairings) input.</code></pre>
+<pre><code>## 25158 paired-reads (in 358 unique pairings) successfully merged out of 26388 (in 671 pairings) input.</code></pre>
+<pre class="r"><code># Inspect the merger data.frame from the first sample
+head(mergers[[1]])</code></pre>
+<pre><code>##                                                                                                                                                                                                                                                                                                                                                              sequence
+## 1   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCGCATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 2 GAGTTTGATTATGGCTCAGGATGAACGCTAGCGACAGGCCTAACACATGCAAGTCGAGGGGCAGCGGGGAGGTAGCAATACCTTTGCCGGCGACCGGCGCACGGGTGAGTAACACGTATGCAATCCACCTGTAACAGGGGGATAACCCGGAGAAATCCGGACTAATACCCCATAATATGGGCGCTCCGCATGGAGAGTTCATTAAAGAGAGCAATTTTGGTTACAGACGAGCATGCGCTCCATTAGCCAGTTGGCGGGGTAACGGCCCACCAAGGCGACGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 3    GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCATCAGGAAGAAAGCTTGCTTTCTTTGCTGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCCTTTACTCGGGGATAGCCTTTCGAAAGAAAGATTAATACCCGATGGCATAATGATTCCGCATGGTTTCATTATTAAAGGATTCCGGTAAAGGATGGGGATGCGTTCCATTAGGTTGTTGGTGAGGTAACGGCTCACCAAGCCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 4   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTCCACATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 5   GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATGGTCTTAGCTTGCTAAGGCCGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGTCTACTCTTGGACAGCCTTCTGAAAGGAAGATTAATACAAGATGGCATCATGAGTTCACATGTTCACATGATTAAAGGTATTCCGGTAGACGATGGGGATGCGTTCCATTAGATAGTAGGCGGGGTAACGGCCCACCTAGTCTTCGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+## 6  GAGTTTGATTATGGCTCAGGATGAACGCTAGCTACAGGCTTAACACATGCAAGTCGAGGGGCAGCATTTTAGTTTGCTTGCAAACTGAAGATGGCGACCGGCGCACGGGTGAGTAACACGTATCCAACCTGCCGATAACTCCGGAATAGCCTTTCGAAAGAAAGATTAATACCGGATAGTATACGAATATCGCATGATATTTTTATTAAAGAATTTCGGTTATCGATGGGGATGCGTTCCATTAGTTTGTTGGCGGGGTAACGGCCCACCAAGACTACGATGGATAGGGGTTCTGAGAGGAAGGTCCCCCACATTGGAACTGAGACACGGTCCAAACTCCTACGGGAGGCAGCA
+##   abundance forward reverse nmatch nmismatch nindel prefer accept
+## 1       755       1       1    107         0      0      2   TRUE
+## 2       344       2       3    105         0      0      2   TRUE
+## 3       305       3       4    108         0      0      2   TRUE
+## 4       293      36       1    107         0      0      2   TRUE
+## 5       279       4       1    107         0      0      2   TRUE
+## 6       259       6       2    106         0      0      2   TRUE</code></pre>
+<div class="content-box-info-lg">
+<p><strong>Considerations for your own data</strong> <svg viewBox="0 0 192 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M176 432c0 44.112-35.888 80-80 80s-80-35.888-80-80 35.888-80 80-80 80 35.888 80 80zM25.26 25.199l13.6 272C39.499 309.972 50.041 320 62.83 320h66.34c12.789 0 23.331-10.028 23.97-22.801l13.6-272C167.425 11.49 156.496 0 142.77 0H49.23C35.504 0 24.575 11.49 25.26 25.199z"></path></svg> Most of your reads should successfully merge. If that is not the case upstream parameters may need to be revisited: Did you trim away the overlap between your reads?</p>
+</div>
+</div>
+<div id="construct-sequence-table" class="section level2">
+<h2>Construct sequence table</h2>
+<p>We can now construct an amplicon sequence variant table (ASV) table, a higher-resolution version of the OTU table produced by traditional methods.</p>
+<pre class="r"><code>seqtab &lt;- makeSequenceTable(mergers)
+dim(seqtab)</code></pre>
+<pre><code>## [1]   4 930</code></pre>
+<pre class="r"><code># Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab))) </code></pre>
+<pre><code>## 
+## 325 335 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 
+##   1  20   3   7   6   1   2  28  18  18 109  49  19  32  66  58  98  96   2   1 
+## 359 360 361 362 363 364 365 366 367 368 370 371 372 376 377 378 379 380 398 448 
+##   6   3  30  63  48  58  19   2   3   5  39   1   5   1   1   2   1   4   4   1</code></pre>
+<div class="content-box-info-lg">
+<p><strong>Considerations for your own data</strong> <svg viewBox="0 0 192 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M176 432c0 44.112-35.888 80-80 80s-80-35.888-80-80 35.888-80 80-80 80 35.888 80 80zM25.26 25.199l13.6 272C39.499 309.972 50.041 320 62.83 320h66.34c12.789 0 23.331-10.028 23.97-22.801l13.6-272C167.425 11.49 156.496 0 142.77 0H49.23C35.504 0 24.575 11.49 25.26 25.199z"></path></svg> Sequences that are much longer or shorter than expected may be the result of non-specific priming. You can remove non-target-length sequences from your sequence table (eg. <code>seqtab2 &lt;- seqtab[,nchar(colnames(seqtab)) %in% 250:256</code>]). This is analogous to “cutting a band” in-silico to get amplicons of the targeted length</p>
+</div>
+</div>
+<div id="remove-chimeras" class="section level2">
+<h2>Remove chimeras</h2>
+<p>The core dada method corrects substitution and indel errors, but chimeras remain. Fortunately, the accuracy of sequence variants after denoising makes identifying chimeric ASVs simpler than when dealing with fuzzy OTUs. Chimeric sequences are identified if they can be exactly reconstructed by combining a left-segment and a right-segment from two more abundant “parent” sequences.</p>
+<pre class="r"><code>seqtab.nochim &lt;- removeBimeraDenovo(seqtab, method=&quot;consensus&quot;, 
+                                    multithread=TRUE, verbose=TRUE)</code></pre>
+<pre><code>## Identified 325 bimeras out of 930 input sequences.</code></pre>
+<p>Let’s check how many ASVs we end up with, we’ll also check what proportion of the original sequences we have retained.</p>
+<pre class="r"><code>dim(seqtab.nochim)</code></pre>
+<pre><code>## [1]   4 605</code></pre>
+<pre class="r"><code>sum(seqtab.nochim)/sum(seqtab)</code></pre>
+<pre><code>## [1] 0.7642884</code></pre>
+<p>We often want to do further inspect or perform some further analysis using the ASV count table so we will save it as a csv file.</p>
+<pre class="r"><code>asv_tab &lt;- as.data.frame(t(seqtab.nochim))
+N &lt;- nrow(asv_tab)
+x = 1:N
+asv_tab$ASVid &lt;- paste(&quot;ASV&quot;,x, sep = &quot;_&quot;)
+asv_tab &lt;- rownames_to_column(asv_tab, var = &quot;ASVseq&quot;)
+asv_tab &lt;- asv_tab[, c(6, 1, 2, 3, 4, 5)]
+# write csv file
+write.csv(asv_tab, &quot;data/ngs/illumina/output/asvtab.csv&quot;)</code></pre>
+<p>We also want to extract the ASV sequences and store in a <code>.fasta</code> format file.</p>
+<pre class="r"><code>seqs &lt;- asv_tab$ASVseq
+names(seqs) = asv_tab$ASVid
+dna = DNAStringSet(seqs)
+# write fasta file
+writeXStringSet(dna, &quot;data/ngs/illumina/output/asv.fasta&quot;)</code></pre>
+<p>The frequency of chimeric sequences varies substantially from dataset to dataset, and depends on on factors including experimental procedures and sample complexity. Here chimeras make up about 21% of the merged sequence variants, but when we account for the abundances of those variants we see they account for only about 4% of the merged sequence reads.</p>
+<div class="content-box-info-lg">
+<p><strong>Considerations for your own data</strong> <svg viewBox="0 0 192 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M176 432c0 44.112-35.888 80-80 80s-80-35.888-80-80 35.888-80 80-80 80 35.888 80 80zM25.26 25.199l13.6 272C39.499 309.972 50.041 320 62.83 320h66.34c12.789 0 23.331-10.028 23.97-22.801l13.6-272C167.425 11.49 156.496 0 142.77 0H49.23C35.504 0 24.575 11.49 25.26 25.199z"></path></svg> Most of your reads should remain after chimera removal (it is not uncommon for a majority of sequence variants to be removed though). If most of your reads were removed as chimeric, upstream processing may need to be revisited. In almost all cases this is caused by primer sequences with ambiguous nucleotides that were not removed prior to beginning the DADA2 pipeline.</p>
+</div>
+</div>
+<div id="track-reads-through-the-pipeline" class="section level2">
+<h2>Track reads through the pipeline</h2>
+<p>As a final check of our progress, we’ll look at the number of reads that made it through each step in the pipeline:</p>
+<pre class="r"><code>getN &lt;- function(x) sum(getUniques(x))
+track &lt;- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+# If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) &lt;- c(&quot;input&quot;, &quot;filtered&quot;, &quot;denoisedF&quot;, &quot;denoisedR&quot;, &quot;merged&quot;, &quot;nonchim&quot;)
+rownames(track) &lt;- sample.names
+track</code></pre>
+<pre><code>##       input filtered denoisedF denoisedR merged nonchim
+## PBS49 23638    15693     14864     15540  14023   10504
+## PBS43 26329    17832     17022     17707  15738   12178
+## PBS39 31301    19236     18444     18977  17360   13129
+## PBS63 39768    27496     26527     27274  25158   19431</code></pre>
+<pre class="r"><code># write the track sequence file to csv
+write.csv(track, &quot;data/ngs/illumina/output/track.csv&quot;)</code></pre>
+</div>
+<div id="assign-taxonomy" class="section level2">
+<h2>Assign taxonomy</h2>
+<p>*This is an “I have prepared earlier” bit for you as it requires a large dataset and takes a while to do computationally.</p>
+<p>Download the silva species assignment database from <a href="https://zenodo.org/record/4587955#.YhTZeJNBzek">zenodo repository</a> <code>silva_species_assignment_v138.1.fa.gz</code>.</p>
+<pre class="r"><code>taxa &lt;- assignTaxonomy(seqtab.nochim, &quot;/Users/Siobhon/db/silva_nr_v128_train_set.fa.gz&quot;, multithread=TRUE)
+
+taxa &lt;- addSpecies(taxa, &quot;/Users/Siobhon/db/silva_species_assignment_v138.1.fa.gz&quot;)
+
+# save rda
+save(taxa, file = &quot;data/ngs/illumina/output/taxa.RData&quot;)</code></pre>
+<p>Let’s inspect the taxonomic assignments:</p>
+<pre class="r"><code># Load in prepared taxa data
+load(&quot;data/ngs/illumina/output/taxa.RData&quot;)
+# show taxa file
+taxa.print &lt;- taxa # Removing sequence rownames for display only
+rownames(taxa.print) &lt;- NULL
+head(taxa.print)</code></pre>
+<pre><code>##      Kingdom    Phylum          Class         Order           Family          
+## [1,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+## [2,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Rikenellaceae&quot; 
+## [3,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+## [4,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Rikenellaceae&quot; 
+## [5,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+## [6,] &quot;Bacteria&quot; &quot;Bacteroidetes&quot; &quot;Bacteroidia&quot; &quot;Bacteroidales&quot; &quot;Bacteroidaceae&quot;
+##      Genus         Species
+## [1,] &quot;Bacteroides&quot; NA     
+## [2,] &quot;Alistipes&quot;   NA     
+## [3,] &quot;Bacteroides&quot; NA     
+## [4,] &quot;Alistipes&quot;   NA     
+## [5,] &quot;Bacteroides&quot; NA     
+## [6,] &quot;Bacteroides&quot; NA</code></pre>
+<p>We now also format to save as csv file</p>
+<pre class="r"><code>tax_tab &lt;- as.data.frame(taxa.print)
+N &lt;- nrow(tax_tab)
+x = 1:N
+tax_tab$ASVid &lt;- paste(&quot;ASV&quot;,x, sep = &quot;_&quot;)
+tax_tab &lt;- tax_tab[, c(8, 1, 2, 3, 4, 5, 6, 7)]
+write.csv(tax_tab, &quot;data/ngs/illumina/output/taxa.csv&quot;)</code></pre>
+<hr />
 </div>
 </div>
 <div id="sequence-alignment-and-phylogeny" class="section level1">

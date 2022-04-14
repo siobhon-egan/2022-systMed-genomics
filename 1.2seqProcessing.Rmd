@@ -168,6 +168,7 @@ plotQualityProfile(fns[1])
 ```
 
 ---
+
 ## Filter and trim
 
 Assign the file names for the filtered `.fastq.gz` files.
