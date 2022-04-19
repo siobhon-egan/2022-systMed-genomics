@@ -43,6 +43,7 @@ load("data/BIO514-microbiome/PBS_data.Rdata")
 # Quick glance at phyloseq object
 ps_M
 ```
+
 ## Inspect data
 
 **Number of reads**
@@ -203,7 +204,6 @@ mean.plot.ord
 **Composition barplot**
 
 To quickly visualize comparison in taxa between make a relative abundance barplot of taxa between sample group (aggregate taxa at family level).
-
 
 ```{r}
 # Get relative abundance and remove low abundant taxa

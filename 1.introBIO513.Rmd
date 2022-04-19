@@ -1,0 +1,62 @@
+---
+title: "BIO513 - genomics lecture and workshop "
+---
+
+Content for BIO513 genomics data analysis workshop 2022.
+
+![](assets/ANPC.png)
+
+# Outline
+
+This lecture will provide an introduction in the data types and analysis for genomics.
+The advent of high-throughput sequencing platforms has resulted in large volumes of data being produced. It important to know how to manage and interpret this data in a reproducible way.
+
+This lecture will cover the following aspects:
+
+1. Sequence data and databases
+
+- Common sequence data file formats (e.g. `.fastq`, `.fasta`, `.bam`, `fast5`)
+- What data is contained in files and how to interpret information
+- Databases and online resources for genomics
+    - How to navigate online NCBI resources, in particular how to interpret output from nucleotide BLAST searches.
+
+2. Tools for analyzing data
+
+- Tools to query, inspect, visualize sequence files
+- Demultiplexing, merging, trimming and quality filtering
+- Discuss methods of assembly/clustering in the different contexts of sequence data
+    - Amplicon sequencing (clustering/denoising into taxonomic units)
+    - Shotgun sequencing (assembling contigs and scaffolds)
+- Be familar with both Unix shell and R environment (inc. packages) for sequence data
+
+
+<!--
+In this lecture we will cover data file formats including:`.fastq`, `.fasta`, `.bam`, `fast5`.
+We will discuss how they relate to the various sequence platforms and what information they provide.
+The lecture will then discuss the following aspects
+
+Assess sequence quality
+Map sequence data onto a reference genome
+Perform de novo assembly tasks
+Quantify sequence data
+Integrate biological context with sequence information
+
+1.Sequence data
+- Databases and online resources for sequence data
+- Learn the common sequence data file formats
+- Learn the common sequence data file formats
+2.Tools for sequencing data
+- Tools to query, inspect, visualize an aligned sequence file
+- Learn the contents of sequence data files
+- Learn to generate sequencing metrics and to process sequence data
+- Learn about Python and R libraries/packages to read sequence data
+-->
+
+
+> Important note: lessons outlined here are designed in the context of delivery through the BIO513 unit RStudio/google cloud server.
+
+Please navigate to the RStudio server and login with your details provided earlier in the unit.
+
+Create a new Rmarkdown file by doing to **File > New File > R Markdown ...**
+
+See the [setup](1.setup.html) page for details on obtaining data if working outside the BIO513 RStudio server.

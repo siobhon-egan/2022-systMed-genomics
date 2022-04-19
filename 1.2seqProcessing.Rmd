@@ -140,11 +140,16 @@ How much do your reads overlap? Some assays rely on complete overlap and therefo
 ---
 
 **STOP and compare with PacBio**
+
+We will take moment to deviate from the dada2 pipeline just to compare quality scores between pacbio and illumina.
+
+Although they are different samples from different studies they are both amplicon 16S bacteria data. The pacbio data here is targeting the full length 16S rRNA gene.
+
 ``` {bash, eval = FALSE, include = TRUE}
 gunzip data/ngs/pacbio/*.fastq.gz
 ```
 
-Set path to where the fastq files are
+Set path to where the `.fastq.gz` files are
 
 ```{r pacbioraw, eval = FALSE, warning=FALSE, message=FALSE}
 # Path to raw data
@@ -166,6 +171,8 @@ sample.names2
 ```{r, eval=FALSE}
 plotQualityProfile(fns[1])
 ```
+
+Much better quality right?!
 
 ---
 
@@ -194,6 +201,21 @@ out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(300,160),
 head(out)
 ```
 
+:::: {.content-box-info-lg}
+**NOTE:** on the BIO513 RStudio cloud we found we were not able to do this part as we cannot write files to the data directory.
+Instead I have made them available for you and you can skip the code chunk above and instead set your filtered seq path as per below and continue.
+::::
+
+```{r, eval=FALSE}
+# set path for filtered seqs
+path.filt <- "data/ngs/illumina/filtered"
+list.files(path.filt)
+
+# pattern of filtered fastq.gz files for forward and reverse sequences
+filtFs <- sort(list.files(path.filt, pattern="_F_filt.fastq.gz", full.names = TRUE))
+filtRs <- sort(list.files(path.filt, pattern="_R_filt.fastq.gz", full.names = TRUE))
+```
+
 ## Learn errors
 
 The DADA2 algorithm makes use of a parametric error model (`err`) and every amplicon dataset has a different set of error rates. 
@@ -206,14 +228,13 @@ errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 ```
 
-It is always worthwhile, as a sanity check if nothing else, to visualize
-the estimated error rates:
+It is always worthwhile, as a sanity check if nothing else, to visualize the estimated error rates:
 
 ```{r}
 plotErrors(errF, nominalQ=TRUE)
 ```
 
-The error rates for each possible transition (A--\>C, A--\>G,...) are
+The error rates for each possible transition (A--\>C, A--\>G,...) are 
 shown. Points are the observed error rates for each consensus quality
 score. The black line shows the estimated error rates after convergence
 of the machine-learning algorithm. The red line shows the error rates
@@ -348,7 +369,7 @@ write.csv(track, "data/ngs/illumina/output/track.csv")
 
 ## Assign taxonomy
 
-*This is an "I have prepared earlier" bit for you as it requires a large dataset and takes a while to do computationally.
+*This is an "I have prepared earlier" bit for you as it requires a large dataset and takes a while to do computationally*.
 
 Download the silva species assignment database from [zenodo repository](https://zenodo.org/record/4587955#.YhTZeJNBzek)
 `silva_species_assignment_v138.1.fa.gz`.
