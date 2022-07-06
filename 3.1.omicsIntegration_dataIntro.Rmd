@@ -1,0 +1,213 @@
+---
+title: "Dry lab - 'omics data integration"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, include = TRUE)
+```
+
+## Libraries
+
+Load libraries
+
+```{r results='hide', message=FALSE, warning=FALSE}
+# pkgs <- c(
+#   "tidyverse",
+#   "rmarkdown",
+#   "phyloseq",
+#   "reshape2",
+#   "tibble",
+#   "readr",
+#   "knitr",
+#   "regclass",
+# )
+pkgs <- c(
+   "phyloseq",
+   "tidyverse")
+
+lapply(pkgs, require, character.only = TRUE)
+# set theme
+```
+
+## Data
+
+Load in pre-processed data
+```{r loaddata}
+## Download Rdata file from github repo link https://github.com/ka-west/PBS_manuscript/raw/master/PBS_data.Rdata
+
+# Load in data
+load("data/BIO514-omicsData/PBS_data.Rdata")
+```
+
+### Meta data
+
+First thing we want to do is see what samples have both microbimic data and NMR data.
+
+To do this we need to check which sampleIDs match in the ps_M@sam_data object and the integrals data.frame.
+
+We encounter our first problem - the `Sample_ID` used in microbiomic metadata has extra characters (e.g. _v1 or _v2).
+We need to remove these characters.
+
+```{r, subintegrals}
+# We encounter our first problem - the Sample_ID used in microbiomic metadata has extra characters (e.g. _v1 or _v2).
+# we need to remove this
+# rename sampleID in ps_M to make sure it matches the Integrals data frame
+ps_M@sam_data$Sample_ID<-gsub("_v1","", ps_M@sam_data$Sample_ID)
+ps_M@sam_data$Sample_ID<-gsub("_v2","", ps_M@sam_data$Sample_ID)
+# subset just the samples which have NMR and Microbiomic data 
+idx<-which(integrals$Patient.TP %in% ps_M@sam_data$Sample_ID)
+integrals_df <- integrals[idx,]
+
+# now subset just the metadata form the data frame
+meta_df <- integrals_df[, c(1:21, 38:41)]
+```
+
+To help let's also rename the Sample_ID col to help with matching
+```{r}
+# rename the Patient.TP col to Sample_ID to match microbiomic data
+colnames(meta_df)[3] <- "Sample_ID"
+# reorder meta data cols to more logical order
+meta_df <-
+  meta_df[, c(3,
+              1,
+              2,
+              4,
+              5,
+              6,
+              7,
+              8,
+              24,
+              9,
+              10,
+              12,
+              13,
+              15,
+              11,
+              14,
+              16,
+              18,
+              17,
+              19,
+              20,
+              21,
+              22,
+              23,
+              25)]
+# we can also save this as csv to open and view separately
+write.csv(meta_df, "data/BIO514-omicsData/metadata.csv")
+```
+
+```{r, viewMeta}
+DT::datatable(
+  meta_df,
+  extensions = 'Buttons',
+  options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+    pageLength = 20
+  ),
+  filter = list(position = 'top', clear = FALSE)
+)
+```
+
+### NMR data 
+
+Subset just the NMR data from the integrals data.frame for samples that matched with microbiome data.
+```{r}
+# subset just the NMR data
+NMR_df <- integrals_df[, c(3, 22:36)]
+colnames(NMR_df)[1] <- "Sample_ID"
+# we can also save this as csv to open and view separately
+write.csv(NMR_df, "data/BIO514-omicsData/integrals.csv")
+```
+
+```{r, viewNMR}
+DT::datatable(
+  NMR_df,
+  extensions = 'Buttons',
+  options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+    pageLength = 20),
+  filter = list(
+  position = 'top', clear = FALSE)
+)
+```
+
+### Microbiome data 
+
+Inspect how many taxa have been unassigned.
+
+```{r}
+taxdf <- as.data.frame(ps_M@tax_table)
+sum(is.na(taxdf$Kingdom))
+sum(is.na(taxdf$Phylum))
+sum(is.na(taxdf$Class))
+sum(is.na(taxdf$Order))
+sum(is.na(taxdf$Family))
+sum(is.na(taxdf$Genus))
+```
+
+#### Transforming data
+
+When dealing with integration of microbiome data with other data types we usually want a simplified way to look at the data.
+
+For example we may want to just take taxa assignments at a certain level and have a combined set of count values.
+
+We use the `psmelt()` function in phyloseq to make a long data frame.
+We can then use this object to group/transform into more bite-size pieces.
+
+```{r}
+melt <- psmelt(ps_M)
+```
+
+**Group by family**
+```{r}
+fam_melt <- dplyr::select(melt,
+                          Sample_ID, Abundance, Family)
+
+fam <- fam_melt %>%
+  dplyr::group_by(Sample_ID, Family) %>%
+  dplyr::summarise(Abundance = sum(Abundance), .groups = "drop") %>%
+  dplyr::filter(Abundance > 1L)
+fam$Abundance <- as.numeric(fam$Abundance)
+fam <-
+  fam %>% pivot_wider(names_from = "Family", values_from = "Abundance")
+# we make the NAs into 0
+fam <- replace(fam, is.na(fam), 0)
+# saving dataset
+write.csv(fam, "data/BIO514-omicsData/family_count.csv")
+```
+
+**Group by genus**
+```{r}
+gen_melt <- dplyr::select(melt,
+                          Sample_ID, Abundance, Genus)
+
+gen <- gen_melt %>%
+  dplyr::group_by(Sample_ID, Genus) %>%
+  dplyr::summarise(Abundance = sum(Abundance), .groups = "drop") %>%
+  dplyr::filter(Abundance > 1L)
+gen$Abundance <- as.numeric(gen$Abundance)
+gen <-
+  gen %>% pivot_wider(names_from = "Genus", values_from = "Abundance")
+# we make the NAs into 0
+gen <- replace(gen, is.na(gen), 0)
+# saving dataset
+write.csv(gen, "data/BIO514-omicsData/genera_count.csv")
+```
+
+Lets see what the genus view looks like
+```{r, viewGen}
+DT::datatable(
+  gen[,1:20],
+  extensions = 'Buttons',
+  options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+    pageLength = 20),
+  filter = list(
+  position = 'top', clear = FALSE)
+)
+```
+

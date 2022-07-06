@@ -18,7 +18,7 @@ navbar:
          href: 1.1seqData.html  
        - text: "Sequence Processing"
          href: 1.2seqProcessing.html  
-    - text: "BIO 514"
+    - text: "BIO 514 - 1"
       icon: fas fa-book-open
       menu:
        - text: "Introduction"
@@ -31,7 +31,16 @@ navbar:
        - text: "Data Cleaning"
          href: 2.2dataCleaning.html
        - text: "Data visualization"
-         href: 2.3dataViz.html      
+         href: 2.3dataViz.html     
+    - text: "BIO 514 - 2"
+      icon: fas fa-book-open
+      menu:
+       - text: "Introduction"
+         href: 3.introBIO514.html
+       - text: "Multi-omic data"
+         href: 3.1.omicsIntegration_dataIntro.html
+       - text: "Multi-omic data visualization"
+         href: 3.2.omicsIntegration_dataViz.html
   right:
   - icon: fab fa-github
     href: https://github.com/siobhon-egan/2022-systMed-genomics

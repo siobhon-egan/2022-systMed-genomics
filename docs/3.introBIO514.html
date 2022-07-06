@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>BIO514 - Workshop 2</title>
+
+<script src="site_libs/header-attrs-2.14.1/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="assets/mystyle.css" type="text/css" />
+<link rel="stylesheet" href="assets/murdoch-fonts.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Systems Medicine</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 513
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="1.introBIO513.html">Introduction</a>
+    </li>
+    <li>
+      <a href="1.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="1.1seqData.html">Sequence data</a>
+    </li>
+    <li>
+      <a href="1.2seqProcessing.html">Sequence Processing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 514 - 1
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="2.introBIO514.html">Introduction</a>
+    </li>
+    <li>
+      <a href="2.setup.html">Set up</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="2.1seqProcessing.html">Sequence processing</a>
+    </li>
+    <li>
+      <a href="2.2dataCleaning.html">Data Cleaning</a>
+    </li>
+    <li>
+      <a href="2.3dataViz.html">Data visualization</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fas fa-book-open"></span>
+     
+    BIO 514 - 2
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="3.introBIO514.html">Introduction</a>
+    </li>
+    <li>
+      <a href="3.1.omicsIntegration_dataIntro.html">Multi-omic data</a>
+    </li>
+    <li>
+      <a href="3.2.omicsIntegration_dataViz.html">Multi-omic data visualization</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/siobhon-egan/2022-systMed-genomics">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">BIO514 - Workshop 2</h1>
+
+</div>
+
+
+<p>Further reading and information</p>
+<ul>
+<li><em>Reading</em>
+<ul>
+<li>Subramanian I, Verma S, Kumar S, Jere A, Anamika K. Multi-omics Data
+Integration, Interpretation, and Its Application. Bioinform Biol
+Insights. 2020;14:1177932219899051. doi: <a
+href="https://doi.org/10.1177/1177932219899051">10.1177/1177932219899051</a>.</li>
+<li>Santiago-Rodriguez TM, Hollister EB. Multi ’omic data integration: A
+review of concepts, considerations, and approaches. Semin Perinatol.
+2021;45(6):151456. doi: <a
+href="https://doi.org/10.1016/j.semperi.2021.151456">10.1016/j.semperi.2021.151456</a>.</li>
+<li>Graw S, Chappell K, Washam CL, Gies A, Bird J, Robeson MS 2nd, Byrum
+SD. Multi-omics data integration considerations and study design for
+biological systems and disease. Mol Omics. 2021;17(2):170-185. doi: <a
+href="https://doi.org/10.1039/d0mo00041h">10.1039/d0mo00041h</a></li>
+<li>Krassowski M, Das V, Sahu SK, Misra BB. State of the Field in
+Multi-Omics Research: From Computational Needs to Data Mining and
+Sharing. Front Genet. 2020;11:610798. doi: <a
+href="https://doi.org/10.3389/fgene.2020.610798">10.3389/fgene.2020.610798</a>.</li>
+</ul></li>
+<li><em>Online courses/material by EMBL-EBI</em>
+<ul>
+<li><a
+href="https://www.ebi.ac.uk/training/events/introduction-multiomics-data-integration-and-visualisation-virtual/">Introduction
+to multiomics data integration and visualisation</a></li>
+<li><a
+href="https://www.ebi.ac.uk/training/events/introduction-multiomics-data-integration/">Introduction
+to multiomics data integration</a></li>
+<li><a
+href="https://www.ebi.ac.uk/training/events/systems-biology-large-datasets-biological-insight-0/">Systems
+biology: From large datasets to biological insight</a></li>
+</ul></li>
+</ul>
+<hr />
+<div id="multiomics-data-analysis" class="section level1">
+<h1>Multiomics data analysis</h1>
+<blockquote>
+<p><strong>What is -omics?</strong> A definition from <a
+href="https://doi.org/10.3389/fgene.2020.610798">Krassowski et
+al. 2020</a><br />
+“Multi-omics, variously called integrated omics, pan-omics, and
+trans-omics, aims to combine two or more omics data sets to aid in data
+analysis, visualization and interpretation to determine the mechanism of
+a biological process.”</p>
+</blockquote>
+<p><a href="https://en.wikipedia.org/wiki/Omics">The wikipedia exert on
+“Omics”</a><br />
+“The branches of science known informally as omics are various
+disciplines in biology whose names end in the suffix -omics, such as
+genomics, proteomics, metabolomics, metagenomics, phenomics and
+transcriptomics. Omics aims at the collective characterization and
+quantification of pools of biological molecules that translate into the
+structure, function, and dynamics of an organism or organisms.<br />
+The related suffix -ome is used to address the objects of study of such
+fields, such as the genome, proteome or metabolome respectively. The
+suffix -ome as used in molecular biology refers to a totality of some
+sort.<br />
+Functional genomics aims at identifying the functions of as many genes
+as possible of a given organism. It combines different -omics techniques
+such as transcriptomics and proteomics with saturated mutant
+collections.”</p>
+<p><strong>Types of ’omic data maybe include</strong>:</p>
+<ul>
+<li>Culturomics</li>
+<li>Epigenomics</li>
+<li>Genomics</li>
+<li>Glycomics</li>
+<li>Lipidomics</li>
+<li>Metabolomics</li>
+<li>Proteomics</li>
+<li>Transcriptomics</li>
+</ul>
+<p><strong>Benefits of multi-omics data</strong></p>
+<ul>
+<li>Compensate for missing or unreliable information in any single data
+type</li>
+<li>The likelihood of false positive discoveries are reduced</li>
+<li>Better understanding of the complete biological model when
+considering different layers of interactions</li>
+</ul>
+<div class="figure">
+<img src="images/multiomics-analysis-1.gif" alt="Image from Subramanian et al. 2020 https://doi.org/10.1177/1177932219899051. Overview of multi-omics data integration tools. The tools/methods are grouped based on their approach and are color coded as per their applications. FSMKL indicates feature selection multiple kernel learning; JIVE, joint and individual variation explained; MCIA, multiple co-inertia analysis; MDI, multiple dataset integration; MFA, multiple factor analysis; MOFA, multi-omics factor analysis; NEMO, neighborhood based multi-omics clustering; PFA, pattern fusion analysis; PMA, penalized multivariate analysis; sMBPLS, sparse multi-block partial least squares; SNF, similarity network fusion; NMF, nonnegative matrix factorization; BCC, Bayesian consensus clustering; PSDF, patient-specific data fusion." width="75%" />
+<p class="caption">
+Image from Subramanian et al. 2020 <a
+href="https://doi.org/10.1177/1177932219899051"
+class="uri">https://doi.org/10.1177/1177932219899051</a>. Overview of
+multi-omics data integration tools. The tools/methods are grouped based
+on their approach and are color coded as per their applications. FSMKL
+indicates feature selection multiple kernel learning; JIVE, joint and
+individual variation explained; MCIA, multiple co-inertia analysis; MDI,
+multiple dataset integration; MFA, multiple factor analysis; MOFA,
+multi-omics factor analysis; NEMO, neighborhood based multi-omics
+clustering; PFA, pattern fusion analysis; PMA, penalized multivariate
+analysis; sMBPLS, sparse multi-block partial least squares; SNF,
+similarity network fusion; NMF, nonnegative matrix factorization; BCC,
+Bayesian consensus clustering; PSDF, patient-specific data fusion.
+</p>
+</div>
+<hr />
+</div>
+<div id="workshop-data" class="section level1">
+<h1>Workshop data</h1>
+<p>For this workshop we will be using a published data set that includes
+NMR and microbiomic information.</p>
+<p>West KA, Kanu C, Maric T, et al. Longitudinal metabolic and gut
+bacterial profiling of pregnant women with previous bariatric surgery.
+Gut 2020;69:1452-1459. doi: <a
+href="http://dx.doi.org/10.1136/gutjnl-2019-319620">10.1136/gutjnl-2019-319620</a></p>
+<p>We will make use of the <em>cleaned</em> dataset provided by the
+authors which they made available at the following repository link <a
+href="https://github.com/ka-west/PBS_manuscript"
+class="uri">https://github.com/ka-west/PBS_manuscript</a>.</p>
+<hr />
+</div>
+<div id="glossary" class="section level1">
+<h1>Glossary</h1>
+<p>Not exhaustive but just help as a guide with the many acronyms that
+exist in statistics.</p>
+<ul>
+<li>BCC, Bayesian consensus clustering;</li>
+<li>CA, component analysis</li>
+<li>DISCO-SCA, simultaneous component analysis with rotation to common
+and distinctive components;</li>
+<li>FSMKL indicates feature selection multiple kernel learning;</li>
+<li>ICA, independent Component Analysis;</li>
+<li>JIVE, joint and individual variation explained;</li>
+<li>MCIA, multiple co-inertia analysis;</li>
+<li>MDI, multiple dataset integration;</li>
+<li>MFA, multiple factor analysis;</li>
+<li>MOFA, multi-omics factor analysis;</li>
+<li>MDS, multidimensional scaling;</li>
+<li>NEMO, neighborhood based multi-omics clustering;</li>
+<li>NMF, nonnegative matrix factorization;</li>
+<li>NPC, non-parametric combination;</li>
+<li>PCA, principal component analysis</li>
+<li>PFA, pattern fusion analysis;</li>
+<li>PMA, penalized multivariate analysis;</li>
+<li>PSDF, patient-specific data fusion;</li>
+<li>pESCA</li>
+<li>QC, quality control</li>
+<li>sMBPLS, sparse multi-block partial least squares;</li>
+<li>SNF, similarity network fusion;</li>
+</ul>
+</div>
+
+<hr> 
+<div class="logos"><img src="assets/squaremu.png" width="50px" align="right"></div>
+
+<br></br>
+
+<p style="text-align: center;"><span style="color: #4F5556;"><em>Copyright, Siobhon Egan, 2022.</em></span></p>
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Add font awesome icons -->
+<p style="text-align: center;">
+    <a href="https://github.com/siobhon-egan/2022-systMed-genomics" class="fa fa-github"></a>
+</p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

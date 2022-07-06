@@ -27,3 +27,14 @@ Website: http://siobhonlegan.com/2022-systMed-genomics/
 | Sequence processing      | [link](2.1seqProcessing.html)      |
 | Data cleaning | [link](2.2dataCleaning.html)      |
 | Data visualization | [link](2.3dataViz.html)      |
+
+
+## BIO 514 Workshop - Multi-omic data integration
+
+>Wednesday 6th July 2022
+
+| Content        | Link           |
+| ------------------- |:--------------------:|
+| Introduction      | [link](3.introBIO514.html)  |
+| Preparing and inspecting data      | [link](3.1.omicsIntegration_dataIntro.html)  |
+| Visualization      | [link](3.2.omicsIntegration_dataViz.html)      |

@@ -33,4 +33,14 @@ Content for Systems Medicine genomics lectures/workshops.
 | Sequence data      | [link](1.1seqData.html)      |
 | Sequence processing      | [link](1.2seqProcessing.html)      |
 
+---
 
+## BIO 514 Workshop - Multi-omic data integration
+
+>Wednesday 6th July 2022
+
+| Content        | Link           |
+| ------------------- |:--------------------:|
+| Introduction      | [link](3.introBIO514.html)  |
+| Preparing and inspecting data      | [link](3.1.omicsIntegration_dataIntro.html)  |
+| Visualization      | [link](3.2.omicsIntegration_dataViz.html)      |
